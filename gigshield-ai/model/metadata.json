@@ -1,0 +1,42 @@
+{
+  "version": "3.0.0",
+  "timestamp": "20260314_215100",
+  "version_tag": "v3.0.0_20260314_215100",
+  "models": {
+    "ensemble": "risk_model.joblib",
+    "random_forest": "fraud_model.joblib",
+    "gradient_boosting": "premium_model.joblib",
+    "isolation_forest": "anomaly_model.joblib"
+  },
+  "metrics": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0,
+    "cv_mean": 1.0,
+    "cv_std": 0.0
+  },
+  "feature_importances": {
+    "rainfall_mm": 0.078,
+    "temperature_c": 0.0219,
+    "aqi": 0.1185,
+    "online_hours": 0.0145,
+    "expected_deliveries": 0.0214,
+    "completed_deliveries": 0.1338,
+    "delivery_drop_rate": 0.6119
+  },
+  "training_data": {
+    "samples": 8000,
+    "features": [
+      "rainfall_mm",
+      "temperature_c",
+      "aqi",
+      "online_hours",
+      "expected_deliveries",
+      "completed_deliveries",
+      "delivery_drop_rate"
+    ],
+    "disruption_rate": 0.3849
+  },
+  "has_xgboost": true
+}

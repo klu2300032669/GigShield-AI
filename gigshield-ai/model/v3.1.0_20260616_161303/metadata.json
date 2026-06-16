@@ -1,0 +1,32 @@
+{
+  "version": "3.1.0",
+  "timestamp": "20260616_161303",
+  "models": {
+    "risk_model": "XGBoost",
+    "fraud_model": "RandForest",
+    "claim_amount": "GradientBoosting",
+    "anomaly": "IsolationForest",
+    "segmentation": "KMeans",
+    "seasonality": "None",
+    "weather": "None",
+    "nlp": "BERT/RoBERTa (Pipeline Loaded Dynamically)"
+  },
+  "metrics": {
+    "risk_accuracy": 0.9955,
+    "fraud_accuracy": 0.852,
+    "claim_amount_rmse": 1305.501477260046
+  },
+  "feature_importances": {
+    "rainfall_mm": 0.09034182131290436,
+    "temperature_c": 0.09203803539276123,
+    "aqi": 0.05015389993786812,
+    "online_hours": 0.05209574103355408,
+    "expected_deliveries": 0.04661911353468895,
+    "completed_deliveries": 0.07855535298585892,
+    "delivery_drop_rate": 0.5901960134506226
+  },
+  "training_data_splits": {
+    "real_samples": 8000,
+    "synthetic_samples": 2000
+  }
+}

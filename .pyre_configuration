@@ -1,0 +1,9 @@
+{
+  "site_package_search_strategy": "all",
+  "source_directories": [
+    "./gigshield-ai"
+  ],
+  "search_path": [
+    "./gigshield-ai/venv/Lib/site-packages"
+  ]
+}
