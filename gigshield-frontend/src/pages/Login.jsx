@@ -174,11 +174,6 @@ function Login() {
             </button>
           </form>
 
-          {/* Demo Credentials Hint */}
-          <div className="demo-credentials animate-fade-in-up" style={{ animationDelay: '250ms' }}>
-            <span className="demo-credentials-label">Demo</span>
-            <span>demo@gigshield.com / demo123</span>
-          </div>
 
           <div className="auth-footer animate-fade-in-up" style={{ animationDelay: '300ms', marginTop: '24px' }}>
             Don't have an account?{' '}
