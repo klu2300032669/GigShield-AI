@@ -19,12 +19,6 @@ public class AdminDataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        long adminCount = workerRepository.countByRole(Worker.Role.ADMIN);
-        if (adminCount > 0) {
-            log.info("✅ Admin user(s) already exist ({} found). Skipping auto-creation.", adminCount);
-            return;
-        }
-
         // Read from environment variables (recommended for production)
         String adminEmail = System.getenv("GIGSHIELD_ADMIN_EMAIL");
         String adminPassword = System.getenv("GIGSHIELD_ADMIN_PASSWORD");
@@ -41,18 +35,19 @@ public class AdminDataLoader implements CommandLineRunner {
             adminName = "Saketh Surubhotla";
         }
 
-        // Check if email already exists (could be a worker)
+        // Check if admin user exists and ensure password is valid
         if (workerRepository.existsByEmail(adminEmail)) {
             final String emailForLog = adminEmail;
-            log.info("📧 Email {} already registered. Promoting to ADMIN.", adminEmail);
+            final String finalAdminPassword = adminPassword;
             workerRepository.findByEmail(adminEmail).ifPresent(worker -> {
                 worker.setRole(Worker.Role.ADMIN);
+                // Force reset password hash to fix invalid seeds from data.sql
+                worker.setPasswordHash(passwordEncoder.encode(finalAdminPassword));
                 workerRepository.save(worker);
-                log.info("✅ User {} promoted to ADMIN.", emailForLog);
+                log.info("✅ User {} promoted to ADMIN and password reset.", emailForLog);
             });
             return;
         }
-
         Worker admin = Worker.builder()
                 .fullName(adminName)
                 .email(adminEmail)
