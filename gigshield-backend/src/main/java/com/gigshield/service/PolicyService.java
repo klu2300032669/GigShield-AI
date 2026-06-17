@@ -24,10 +24,45 @@ public class PolicyService {
     private final PolicyRepository policyRepository;
     private final WorkerRepository workerRepository;
     private final InsurancePlanRepository insurancePlanRepository;
+    private final com.gigshield.client.AIPredictionClient aiPredictionClient;
 
     @org.springframework.cache.annotation.Cacheable("plans")
     public List<InsurancePlan> getAllActivePlans() {
         return insurancePlanRepository.findByIsActiveTrue();
+    }
+
+    public List<InsurancePlanResponseDTO> getDynamicPlans(String city, Double rainfall, Double temp, Integer aqi) {
+        List<InsurancePlan> basePlans = getAllActivePlans();
+        
+        return basePlans.stream().map(plan -> {
+            // Build AI Request
+            PremiumPredictionRequestDTO aiRequest = PremiumPredictionRequestDTO.builder()
+                    .base_premium(plan.getPremiumAmount().doubleValue())
+                    .city(city)
+                    .rainfall_mm(rainfall)
+                    .temperature_c(temp)
+                    .aqi(aqi)
+                    .coverage_type(plan.getCoverageType().name())
+                    .risk_level("MEDIUM") // Default assumption, AI might refine it
+                    .build();
+
+            // Call AI for dynamic pricing
+            PremiumPredictionResponseDTO aiResponse = aiPredictionClient.predictPremium(aiRequest);
+
+            // Return hydrated DTO
+            return InsurancePlanResponseDTO.builder()
+                    .id(plan.getId())
+                    .planName(plan.getPlanName())
+                    .description(plan.getDescription())
+                    .coverageType(plan.getCoverageType())
+                    .originalPremiumAmount(plan.getPremiumAmount())
+                    .premiumAmount(java.math.BigDecimal.valueOf(aiResponse.getDynamic_premium()))
+                    .maxPayout(plan.getMaxPayout())
+                    .billingCycle(plan.getBillingCycle())
+                    .isActive(plan.getIsActive())
+                    .pricingReasoning(aiResponse.getReasoning())
+                    .build();
+        }).collect(Collectors.toList());
     }
 
     public InsurancePlan getPlanById(Long planId) {

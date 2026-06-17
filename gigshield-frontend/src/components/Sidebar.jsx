@@ -4,6 +4,8 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { notificationApi } from '../api/api.js';
 import CitySelector from './CitySelector.jsx';
 import ThemeToggle from './ThemeToggle.jsx';
+import LanguageSwitcher from './LanguageSwitcher.jsx';
+import { useTranslation } from 'react-i18next';
 import {
   Zap, LayoutDashboard, Shield, ClipboardList, FileText,
   Bell, Settings, LogOut, MapPin, Menu, X,
@@ -12,6 +14,7 @@ import {
 
 function Sidebar() {
   const { worker, logout, isAdmin } = useAuth();
+  const { t } = useTranslation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -39,14 +42,14 @@ function Sidebar() {
   }, [worker?.id]);
 
   const mainNavItems = [
-    { path: '/dashboard',     icon: LayoutDashboard, label: 'Dashboard' },
-    { path: '/plans',         icon: Shield,          label: 'Plans' },
-    { path: '/policies',      icon: ClipboardList,   label: 'My Policies' },
-    { path: '/claims',        icon: FileText,        label: 'Claims' },
-    { path: '/weather',       icon: CloudSun,        label: 'Weather' },
-    { path: '/analytics',     icon: BarChart3,       label: 'Analytics' },
-    { path: '/notifications', icon: Bell,            label: 'Notifications', badge: unreadCount },
-    { path: '/settings',      icon: Settings,        label: 'Settings' },
+    { path: '/dashboard',     icon: LayoutDashboard, label: t('sidebar.dashboard') },
+    { path: '/plans',         icon: Shield,          label: t('sidebar.plans') },
+    { path: '/policies',      icon: ClipboardList,   label: t('sidebar.policies') },
+    { path: '/claims',        icon: FileText,        label: t('sidebar.claims') },
+    { path: '/weather',       icon: CloudSun,        label: t('sidebar.weather') },
+    { path: '/analytics',     icon: BarChart3,       label: t('sidebar.analytics') },
+    { path: '/notifications', icon: Bell,            label: t('sidebar.notifications'), badge: unreadCount },
+    { path: '/settings',      icon: Settings,        label: t('sidebar.settings') },
   ];
 
   const adminNavItems = [
@@ -139,6 +142,7 @@ function Sidebar() {
           </div>
           <div className="sidebar-footer-actions">
             <ThemeToggle />
+            <LanguageSwitcher />
             <button
               className="sidebar-logout-btn"
               onClick={logout}

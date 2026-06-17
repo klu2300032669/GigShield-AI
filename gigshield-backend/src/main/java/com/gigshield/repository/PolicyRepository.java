@@ -16,6 +16,8 @@ public interface PolicyRepository extends JpaRepository<Policy, Long> {
 
     List<Policy> findByWorkerIdAndStatus(Long workerId, Policy.PolicyStatus status);
 
+    List<Policy> findByStatus(Policy.PolicyStatus status);
+
     @Query("SELECT p FROM Policy p JOIN FETCH p.worker JOIN FETCH p.plan ORDER BY p.createdAt DESC")
     List<Policy> findAllWithDetails();
 

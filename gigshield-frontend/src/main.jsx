@@ -7,6 +7,7 @@ import { LocationProvider } from './context/LocationContext.jsx';
 import { ToastProvider } from './context/ToastContext.jsx';
 import App from './App.jsx';
 import './index.css';
+import './i18n';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

@@ -1,4 +1,4 @@
-﻿from fastapi import FastAPI, HTTPException  # type: ignore
+from fastapi import FastAPI, HTTPException  # type: ignore
 from fastapi.middleware.cors import CORSMiddleware  # type: ignore
 import joblib  # type: ignore
 import pandas as pd  # type: ignore
@@ -20,7 +20,8 @@ from schemas import (  # type: ignore
     ClaimAmountRequest, ClaimAmountResponse,
     NLPAnalysisRequest, NLPAnalysisResponse,
     ModelInfo, ModelListResponse, RollbackResponse,
-    CompareResponse, ExplainRequest, ExplainResponse, DriftDetectionResponse
+    CompareResponse, ExplainRequest, ExplainResponse, DriftDetectionResponse,
+    PremiumPredictionRequest, PremiumPredictionResponse
 )
 
 # Optional Advanced Libraries
@@ -269,6 +270,60 @@ async def predict_risk(request: RiskPredictionRequest):
     except Exception as e:
         logger.error(f"Prediction error: {e}")
         return _fallback_prediction(request)
+
+@app.post("/predict-premium", response_model=PremiumPredictionResponse)
+async def predict_premium(request: PremiumPredictionRequest):
+    # Dynamic Pricing Logic based on real-time environmental factors
+    multiplier = 1.0
+    reasoning = []
+
+    # 1. Weather Impact
+    if request.rainfall_mm > 50:
+        multiplier += 0.3
+        reasoning.append("High rainfall predicted (+30% risk premium)")
+    elif request.rainfall_mm > 20:
+        multiplier += 0.15
+        reasoning.append("Moderate rainfall predicted (+15% risk premium)")
+
+    if request.temperature_c > 40:
+        multiplier += 0.2
+        reasoning.append("Extreme heat wave (+20% risk premium)")
+    elif request.temperature_c < 5:
+        multiplier += 0.15
+        reasoning.append("Freezing conditions (+15% risk premium)")
+        
+    # 2. AQI Impact
+    if request.aqi > 300:
+        multiplier += 0.25
+        reasoning.append("Hazardous air quality (+25% risk premium)")
+    elif request.aqi > 150:
+        multiplier += 0.1
+        reasoning.append("Poor air quality (+10% risk premium)")
+
+    # 3. Base Risk Level Impact
+    if request.risk_level == "HIGH":
+        multiplier += 0.2
+    elif request.risk_level == "LOW":
+        # Discount for safe conditions
+        multiplier -= 0.1
+        reasoning.append("Safe environmental conditions (-10% safe discount)")
+
+    # 4. Coverage Type
+    if request.coverage_type == "COMPREHENSIVE":
+        multiplier *= 1.2
+    elif request.coverage_type == "PREMIUM":
+        multiplier *= 1.5
+
+    # Cap the multiplier
+    multiplier = max(0.5, min(multiplier, 3.0))
+    dynamic_prem = round(request.base_premium * multiplier, 2)
+
+    return PremiumPredictionResponse(
+        original_premium=request.base_premium,
+        dynamic_premium=dynamic_prem,
+        risk_multiplier=round(multiplier, 2),
+        reasoning="; ".join(reasoning) if reasoning else "Standard baseline risk."
+    )
 
 @app.post("/detect-fraud", response_model=FraudDetectionResponse)
 async def detect_fraud(request: FraudDetectionRequest):

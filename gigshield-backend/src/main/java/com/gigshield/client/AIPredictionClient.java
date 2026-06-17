@@ -1,5 +1,7 @@
 package com.gigshield.client;
 
+import com.gigshield.dto.PremiumPredictionRequestDTO;
+import com.gigshield.dto.PremiumPredictionResponseDTO;
 import com.gigshield.dto.RiskPredictionRequestDTO;
 import com.gigshield.dto.RiskPredictionResponseDTO;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +39,32 @@ public class AIPredictionClient {
             log.error("AI Service unavailable: {}. Using fallback rule-based engine.", e.getMessage());
             return calculateFallbackRisk(request);
         }
+    }
+
+    public PremiumPredictionResponseDTO predictPremium(PremiumPredictionRequestDTO request) {
+        String url = aiServiceUrl + "/predict-premium";
+        try {
+            log.info("Calling AI service at {} to predict premium for city {}", url, request.getCity());
+            PremiumPredictionResponseDTO response = restTemplate.postForObject(url, request, PremiumPredictionResponseDTO.class);
+            if (response != null) {
+                return response;
+            }
+            log.warn("AI Service returned null response for premium prediction. Using fallback.");
+            return calculateFallbackPremium(request);
+        } catch (Exception e) {
+            log.error("AI Service unavailable for premium prediction: {}. Using fallback.", e.getMessage());
+            return calculateFallbackPremium(request);
+        }
+    }
+
+    private PremiumPredictionResponseDTO calculateFallbackPremium(PremiumPredictionRequestDTO request) {
+        log.info("Computing fallback premium for city {}", request.getCity());
+        return PremiumPredictionResponseDTO.builder()
+                .original_premium(request.getBase_premium())
+                .dynamic_premium(request.getBase_premium())
+                .risk_multiplier(1.0)
+                .reasoning("Fallback engine applied. No dynamic adjustments.")
+                .build();
     }
 
     /**

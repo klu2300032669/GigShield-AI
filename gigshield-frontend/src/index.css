@@ -711,7 +711,34 @@ h4 { font-size: 1.25rem; font-weight: 600; }
 
 .btn-sm { padding: 8px 16px; font-size: 0.825rem; }
 .btn-full { width: 100%; }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+.btn:disabled {
+  opacity: 0.6; cursor: not-allowed;
+  transform: none; box-shadow: none;
+}
+
+/* Premium Glow Effect for Primary Action Buttons */
+.btn-glow {
+  position: relative;
+  z-index: 1;
+}
+
+.btn-glow::after {
+  content: '';
+  position: absolute;
+  top: -2px; left: -2px; right: -2px; bottom: -2px;
+  background: var(--gradient-primary);
+  z-index: -1;
+  border-radius: inherit;
+  filter: blur(8px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.btn-glow:hover:not(:disabled)::after {
+  opacity: 0.6;
+}
+
+/* Forms */
 
 .btn-loading {
   position: relative;
@@ -992,11 +1019,11 @@ h4 { font-size: 1.25rem; font-weight: 600; }
 .plan-icon.pollution { background: var(--accent-violet-glow); color: var(--accent-violet); }
 .plan-icon.all { background: var(--accent-emerald-glow); color: var(--accent-emerald); }
 
-.plan-name { font-size: 1.1rem; font-weight: 700; margin-bottom: var(--space-xs); }
+.plan-name { font-size: 1.15rem; font-weight: 800; margin-bottom: var(--space-xs); color: var(--text-primary); }
 
 .plan-description {
-  font-size: 0.82rem; color: var(--text-secondary);
-  line-height: 1.5;
+  font-size: 0.84rem; color: var(--text-color);
+  line-height: 1.5; opacity: 0.85;
 }
 
 .plan-card-body {
@@ -1024,7 +1051,7 @@ h4 { font-size: 1.25rem; font-weight: 600; }
 
 .plan-feature {
   display: flex; align-items: center; gap: var(--space-sm);
-  font-size: 0.82rem; color: var(--text-secondary);
+  font-size: 0.84rem; color: var(--text-color);
 }
 
 .plan-feature-icon { color: var(--accent-emerald); flex-shrink: 0; }

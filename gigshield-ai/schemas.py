@@ -89,6 +89,23 @@ class FraudDetectionResponse(BaseModel):
     risk_level: str  # LOW, MEDIUM, HIGH, CRITICAL
     flags: List[str]
 
+# ---- Premium Prediction Models ----
+
+class PremiumPredictionRequest(BaseModel):
+    base_premium: float
+    city: str
+    rainfall_mm: float = 0.0
+    temperature_c: float = 25.0
+    aqi: int = 50
+    risk_level: str = "LOW"
+    coverage_type: str = "BASIC"
+
+class PremiumPredictionResponse(BaseModel):
+    original_premium: float
+    dynamic_premium: float
+    risk_multiplier: float
+    reasoning: str
+
 # ---- Claim Amount Prediction Models ----
 
 class ClaimAmountRequest(BaseModel):

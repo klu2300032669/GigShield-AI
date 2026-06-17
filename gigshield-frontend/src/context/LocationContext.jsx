@@ -24,9 +24,10 @@ export function LocationProvider({ children }) {
   const [permissionState, setPermissionState] = useState('prompt'); // 'granted' | 'denied' | 'prompt'
   const [coordinates, setCoordinates] = useState(null);
   const [locationHistory, setLocationHistory] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem('gigshield_location_history') || '[]');
-    } catch { return []; }
+    // User requested to remove old mock history (e.g., "hyd")
+    // We clear it here to ensure a fresh slate of purely real GPS data.
+    localStorage.removeItem('gigshield_location_history');
+    return [];
   });
 
   const setCity = useCallback((newCity) => {

@@ -167,6 +167,44 @@ function Plans() {
                   <span className="plan-price-amount">{formatCurrency(plan.premiumAmount)}</span>
                   <span className="plan-price-period">/{plan.billingCycle === 'WEEKLY' ? 'week' : 'month'}</span>
                 </div>
+                {plan.originalPremiumAmount && plan.originalPremiumAmount !== plan.premiumAmount && (
+                  <div style={{ textAlign: 'center', marginTop: '4px' }}>
+                    <span style={{ textDecoration: 'line-through', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                      {formatCurrency(plan.originalPremiumAmount)}
+                    </span>
+                    <span style={{ 
+                      marginLeft: '8px', 
+                      fontSize: '0.7rem', 
+                      fontWeight: 600,
+                      padding: '2px 8px', 
+                      borderRadius: '12px',
+                      background: plan.premiumAmount > plan.originalPremiumAmount 
+                        ? 'rgba(239,68,68,0.15)' : 'rgba(16,185,129,0.15)',
+                      color: plan.premiumAmount > plan.originalPremiumAmount 
+                        ? 'var(--danger)' : 'var(--success)'
+                    }}>
+                      {plan.premiumAmount > plan.originalPremiumAmount ? '⬆ Surge' : '⬇ Discount'}
+                    </span>
+                  </div>
+                )}
+                {plan.pricingReasoning && plan.pricingReasoning !== 'Standard baseline risk.' && (
+                  <div style={{ 
+                    marginTop: '8px', padding: '8px 12px', 
+                    background: 'var(--bg-glass)', 
+                    border: '1px solid var(--border-color)',
+                    borderRadius: 'var(--radius-sm)', 
+                    fontSize: '0.75rem', 
+                    color: 'var(--text-color)',
+                    textAlign: 'left',
+                    lineHeight: 1.4,
+                    display: 'flex',
+                    gap: '6px',
+                    alignItems: 'flex-start'
+                  }}>
+                    <span style={{ fontSize: '1rem' }}>🧠</span> 
+                    <span style={{ opacity: 0.9 }}><strong>AI Reasoning:</strong> {plan.pricingReasoning}</span>
+                  </div>
+                )}
 
                 <ul className="plan-features">
                   {getFeatures(plan).map((feature, i) => (
@@ -178,7 +216,7 @@ function Plans() {
                 </ul>
 
                 <button
-                  className={`btn ${isPopular ? 'btn-primary' : 'btn-outline'} btn-full`}
+                  className={`btn ${isPopular ? 'btn-primary btn-glow' : 'btn-outline'} btn-full`}
                   onClick={() => handlePurchaseClick(plan)}
                   style={{ marginTop: 'auto' }}
                 >

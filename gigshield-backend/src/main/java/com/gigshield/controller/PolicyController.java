@@ -22,9 +22,13 @@ public class PolicyController {
     private final PolicyService policyService;
 
     @GetMapping("/plans")
-    @Operation(summary = "Get all active insurance plans")
-    public ResponseEntity<ApiResponse<List<InsurancePlan>>> getAllPlans() {
-        List<InsurancePlan> plans = policyService.getAllActivePlans();
+    @Operation(summary = "Get all active insurance plans with dynamic AI pricing")
+    public ResponseEntity<ApiResponse<List<InsurancePlanResponseDTO>>> getAllPlans(
+            @RequestParam(required = false, defaultValue = "Unknown") String city,
+            @RequestParam(required = false, defaultValue = "0.0") Double rainfall,
+            @RequestParam(required = false, defaultValue = "25.0") Double temperature,
+            @RequestParam(required = false, defaultValue = "50") Integer aqi) {
+        List<InsurancePlanResponseDTO> plans = policyService.getDynamicPlans(city, rainfall, temperature, aqi);
         return ResponseEntity.ok(ApiResponse.success(plans));
     }
 

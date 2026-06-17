@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
-import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { paymentApi, policyApi } from '../api/api.js';
 import { CreditCard, CheckCircle2, Loader2, X, Shield, Lock } from 'lucide-react';
 import '../index.css';
@@ -10,25 +10,6 @@ const stripePromise = loadStripe(
   import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_placeholder'
 );
 
-// Card element styling to match our dark theme
-const CARD_ELEMENT_OPTIONS = {
-  style: {
-    base: {
-      color: '#e2e8f0',
-      fontFamily: '"Inter", system-ui, sans-serif',
-      fontSize: '15px',
-      fontSmoothing: 'antialiased',
-      '::placeholder': { color: '#64748b' },
-      iconColor: '#38bdf8',
-    },
-    invalid: {
-      color: '#fb7185',
-      iconColor: '#fb7185',
-    },
-  },
-  hidePostalCode: true,
-};
-
 // Inner checkout form (must be inside <Elements>)
 function CheckoutForm({ plan, workerId, onClose, onSuccess }) {
   const stripe = useStripe();
@@ -36,86 +17,66 @@ function CheckoutForm({ plan, workerId, onClose, onSuccess }) {
   const [step, setStep] = useState(1); // 1: Form, 2: Processing, 3: Success
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [cardComplete, setCardComplete] = useState(false);
 
-  const handlePay = async () => {
+  const handlePay = async (e) => {
+    e.preventDefault();
     if (!stripe || !elements) return;
 
     setLoading(true);
     setError('');
+    setStep(2);
 
-    try {
-      // 1. Create PaymentIntent on our backend (calls Stripe API)
-      const intentResponse = await paymentApi.createIntent({
-        policyId: plan.id,
-        workerId: workerId,
-        amount: plan.premiumAmount,
-        currency: 'INR',
-        paymentMethod: 'CARD',
-      });
+    // Confirm the payment with Stripe
+    // For UPI, this will redirect the user. We specify a return_url.
+    const { error: stripeError, paymentIntent } = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        return_url: `${window.location.origin}/dashboard?payment_success=true&plan_id=${plan.id}&worker_id=${workerId}`,
+      },
+      // If it's a card payment, it might not redirect unless 3D Secure is required.
+      // We set redirect: 'if_required' to avoid redirecting for standard cards.
+      redirect: 'if_required',
+    });
 
-      const { clientSecret, status: intentStatus, errorMessage } = intentResponse?.data || {};
-
-      if (intentStatus === 'FAILED' || !clientSecret) {
-        setError(errorMessage || 'Failed to initialize payment. Please try again.');
-        setLoading(false);
-        return;
-      }
-
-      // 2. Show processing state
-      setStep(2);
-
-      // 3. Confirm card payment with Stripe (card data goes directly to Stripe, never our server)
-      const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: {
-          card: elements.getElement(CardElement),
-        },
-      });
-
-      if (stripeError) {
-        setError(stripeError.message || 'Payment failed. Please check your card details.');
-        setStep(1);
-        setLoading(false);
-        return;
-      }
-
-      if (paymentIntent.status === 'succeeded') {
-        // 4. Payment confirmed — create the policy in our system
-        try {
-          await policyApi.purchase({ workerId, planId: plan.id });
-        } catch {
-          // Policy creation might fail but payment is already done
-          // The webhook will handle this as a fallback
-        }
-
-        setStep(3);
-        setTimeout(() => {
-          onSuccess();
-        }, 2500);
-      } else {
-        setError('Payment requires additional verification. Please try again.');
-        setStep(1);
-      }
-    } catch (err) {
-      setError(err.message || 'Payment failed. Please try again.');
+    if (stripeError) {
+      setError(stripeError.message || 'Payment failed. Please try again.');
       setStep(1);
-    } finally {
       setLoading(false);
+      return;
     }
+
+    if (paymentIntent && paymentIntent.status === 'succeeded') {
+      // Payment confirmed without redirect (e.g., standard card)
+      try {
+        await policyApi.purchase({ workerId, planId: plan.id });
+      } catch (e) {
+        console.error("Policy creation failed, but payment succeeded. Webhook will handle it.", e);
+      }
+      setStep(3);
+      setTimeout(() => {
+        onSuccess();
+      }, 2500);
+    } else {
+      // Pending or requires action
+      setError('Payment requires additional verification or is pending.');
+      setStep(1);
+    }
+    
+    setLoading(false);
   };
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content glass-card" style={{ maxWidth: '420px', width: '100%' }}>
+      <div className="modal-content glass-card" style={{ maxWidth: '420px', width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
 
         {step !== 3 && (
-          <button className="modal-close" onClick={onClose}>
+          <button className="modal-close" onClick={onClose} disabled={loading}>
             <X size={20} />
           </button>
         )}
 
         {step === 1 && (
-          <div className="payment-init">
+          <form onSubmit={handlePay} className="payment-init">
             <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
               <div style={{
                 background: 'linear-gradient(135deg, rgba(56,189,248,0.15), rgba(139,92,246,0.15))',
@@ -158,45 +119,33 @@ function CheckoutForm({ plan, workerId, onClose, onSuccess }) {
               </div>
             )}
 
-            {/* Stripe Card Element */}
-            <div style={{ marginBottom: '1.5rem' }}>
-              <label className="form-label" style={{ marginBottom: '0.5rem', display: 'block' }}>
-                Card Details
-              </label>
-              <div style={{
-                background: 'var(--bg-lighter)',
-                border: '1px solid var(--border-color)',
-                borderRadius: '10px',
-                padding: '14px 12px',
-                transition: 'border-color 0.2s ease',
-              }}>
-                <CardElement
-                  options={CARD_ELEMENT_OPTIONS}
-                  onChange={(e) => {
-                    setCardComplete(e.complete);
-                    if (e.error) setError(e.error.message);
-                    else setError('');
-                  }}
-                />
-              </div>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.72rem', marginTop: '6px' }}>
-                Use test card: 4242 4242 4242 4242 · Any future date · Any CVC
-              </p>
+            {/* Stripe Payment Element (Supports UPI, Card, Google Pay, etc.) */}
+            <div style={{ marginBottom: '1.5rem', minHeight: '150px' }}>
+              <PaymentElement options={{
+                layout: 'tabs',
+                defaultValues: {
+                  billingDetails: {
+                    address: {
+                      country: 'IN'
+                    }
+                  }
+                }
+              }} />
             </div>
 
             <button
-              className="btn btn-primary btn-full"
-              onClick={handlePay}
-              disabled={loading || !stripe || !cardComplete}
+              type="submit"
+              className="btn btn-primary btn-full btn-glow"
+              disabled={loading || !stripe || !elements}
               style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem' }}
             >
               {loading ? (
-                <><Loader2 size={18} className="spin" /> Initializing...</>
+                <><Loader2 size={18} className="spin" /> Processing...</>
               ) : (
                 <><Shield size={16} /> Pay ₹{plan.premiumAmount}</>
               )}
             </button>
-          </div>
+          </form>
         )}
 
         {step === 2 && (
@@ -204,7 +153,7 @@ function CheckoutForm({ plan, workerId, onClose, onSuccess }) {
             <Loader2 size={48} className="spin" color="var(--accent-blue)" style={{ margin: '0 auto 1.5rem' }} />
             <h3>Processing Payment</h3>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-              Verifying with Stripe — please do not close this window...
+              Verifying with Stripe — you may be redirected to complete the payment...
             </p>
           </div>
         )}
@@ -230,10 +179,66 @@ function CheckoutForm({ plan, workerId, onClose, onSuccess }) {
   );
 }
 
-// Outer wrapper that provides Stripe context
+// Outer wrapper that provides Stripe context and fetches ClientSecret
 function PaymentModal({ plan, workerId, onClose, onSuccess }) {
+  const [clientSecret, setClientSecret] = useState('');
+  const [initError, setInitError] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const initPayment = async () => {
+      try {
+        const intentResponse = await paymentApi.createIntent({
+          policyId: plan.id,
+          workerId: workerId,
+          amount: plan.premiumAmount,
+          currency: 'INR',
+        });
+        
+        if (intentResponse?.data?.clientSecret) {
+          setClientSecret(intentResponse.data.clientSecret);
+        } else {
+          setInitError('Could not initialize payment gateway. Please ensure Stripe API keys are configured correctly.');
+        }
+      } catch (err) {
+        setInitError('Failed to connect to payment server. Please verify your connection and Stripe configuration.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    initPayment();
+  }, [plan, workerId]);
+
+  if (isLoading) {
+    return (
+      <div className="modal-overlay">
+        <div className="modal-content glass-card" style={{ maxWidth: '400px', textAlign: 'center' }}>
+          <Loader2 size={32} className="spin" color="var(--primary)" style={{ margin: '0 auto 1rem' }} />
+          <p>Loading secure checkout...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (initError) {
+    return (
+      <div className="modal-overlay">
+        <div className="modal-content glass-card" style={{ maxWidth: '400px', textAlign: 'center' }}>
+          <h3 style={{ color: 'var(--danger)', marginBottom: '1rem' }}>Payment Gateway Error</h3>
+          <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '1.5rem', lineHeight: '1.5' }}>
+            {initError}
+          </p>
+          <button className="btn btn-outline" onClick={onClose}>Close</button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <Elements stripe={stripePromise}>
+    <Elements stripe={stripePromise} options={{ 
+      clientSecret, 
+      appearance: { theme: 'night', variables: { colorPrimary: '#38bdf8' } } 
+    }}>
       <CheckoutForm
         plan={plan}
         workerId={workerId}
@@ -245,3 +250,4 @@ function PaymentModal({ plan, workerId, onClose, onSuccess }) {
 }
 
 export default PaymentModal;
+

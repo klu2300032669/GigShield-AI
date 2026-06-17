@@ -53,6 +53,7 @@ public class StripePaymentServiceImpl implements PaymentService {
                     .setAmount(amountInSmallestUnit)
                     .setCurrency(currency)
                     .addPaymentMethodType("card")
+                    .addPaymentMethodType("upi")
                     .putMetadata("worker_id", String.valueOf(request.getWorkerId()))
                     .putMetadata("policy_id", String.valueOf(request.getPolicyId()))
                     .setDescription("GigShield Insurance Premium — Worker #" + request.getWorkerId())

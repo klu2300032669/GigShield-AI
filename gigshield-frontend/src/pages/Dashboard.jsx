@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useLocation } from '../context/LocationContext.jsx';
-import { workerApi } from '../api/api.js';
+import { workerApi, policyApi } from '../api/api.js';
 import { DashboardSkeleton } from '../components/ui/SkeletonLoader.jsx';
 import {
   Shield, Banknote, FileText, Bell, TrendingDown,
@@ -201,6 +201,33 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [liveWeather, setLiveWeather] = useState(null);
   const [error, setError] = useState('');
+  const [paymentToast, setPaymentToast] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Handle UPI/redirect payment success
+  useEffect(() => {
+    if (searchParams.get('payment_success') === 'true') {
+      const planId = searchParams.get('plan_id');
+      const wId = searchParams.get('worker_id');
+      
+      // Create the policy after redirect
+      if (planId && wId) {
+        policyApi.purchase({ workerId: Number(wId), planId: Number(planId) })
+          .then(() => {
+            setPaymentToast('🎉 Payment successful! Your new policy is now active.');
+          })
+          .catch(() => {
+            setPaymentToast('✅ Payment received! Policy will activate shortly.');
+          });
+      } else {
+        setPaymentToast('✅ Payment completed successfully!');
+      }
+      
+      // Clean the URL
+      setSearchParams({}, { replace: true });
+      setTimeout(() => setPaymentToast(''), 8000);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { fetchDashboard(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -240,6 +267,15 @@ function Dashboard() {
 
   return (
     <div>
+      {/* Payment Success Toast */}
+      {paymentToast && (
+        <div className="alert alert-success animate-fade-in" style={{ 
+          marginBottom: 'var(--space-md)', fontSize: '0.95rem', fontWeight: 600,
+          display: 'flex', alignItems: 'center', gap: '8px'
+        }}>
+          <CheckCircle2 size={18} /> {paymentToast}
+        </div>
+      )}
       {/* Header */}
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 'var(--space-md)' }}>
         <div>
@@ -297,28 +333,6 @@ function Dashboard() {
           {isDetecting ? 'Detecting…' : 'Refresh Location'}
         </button>
       </div>
-
-      {/* Location Mismatch Warning */}
-      {cityMismatch && (
-        <div className="alert animate-fade-in-up" role="alert" style={{
-          display: 'flex', alignItems: 'center', gap: 10, marginBottom: 'var(--space-md)',
-          background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)',
-          borderRadius: 'var(--radius-md)', padding: '10px 14px',
-          color: 'var(--accent-amber)', fontSize: '0.85rem',
-        }}>
-          <AlertTriangle size={16} style={{ flexShrink: 0 }} />
-          <span>
-            Your registered city ({worker.city}) differs from detected location ({city}).
-            <button
-              className="btn btn-ghost btn-sm"
-              onClick={detectLocation}
-              style={{ marginLeft: 8, padding: '2px 8px', fontSize: '0.78rem', color: 'var(--accent-amber)' }}
-            >
-              <Navigation size={12} /> Update
-            </button>
-          </span>
-        </div>
-      )}
 
       {/* Top Banner & Widgets */}
       <div className="dashboard-top-widgets">
