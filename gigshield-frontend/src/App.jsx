@@ -36,6 +36,7 @@ function RouteAnnouncer() {
 
   useEffect(() => {
     const pageName = location.pathname.replace(/^\//, '').replace(/-/g, ' ') || 'home';
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setAnnouncement(`Navigated to ${pageName} page`);
   }, [location.pathname]);
 

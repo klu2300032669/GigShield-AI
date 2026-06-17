@@ -137,7 +137,7 @@ function WeatherWidgetMini({ city, coordinates, onWeatherUpdate }) {
     };
     fetchWeather();
     return () => { cancelled = true; };
-  }, [city, coordinates]);
+  }, [city, coordinates, onWeatherUpdate]);
 
   const getWeatherLabel = (code) => {
     if (code <= 3) return 'Clear';
@@ -196,10 +196,9 @@ function WeatherWidgetMini({ city, coordinates, onWeatherUpdate }) {
 
 function Dashboard() {
   const { worker } = useAuth();
-  const { city, coordinates, detectLocation, isDetecting, lastUpdated, accuracyLevel } = useLocation();
+  const { city, coordinates, detectLocation, isDetecting, lastUpdated } = useLocation();
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [payouts, setPayouts] = useState([]);
   const [liveWeather, setLiveWeather] = useState(null);
   const [error, setError] = useState('');
 

@@ -22,16 +22,16 @@ function Policies() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [policyToCancel, setPolicyToCancel] = useState(null);
 
-  useEffect(() => { fetchPolicies(); }, []);
-
-  const fetchPolicies = async () => {
+  const fetchPolicies = useCallback(async () => {
     try {
       const response = await policyApi.getWorkerPolicies(worker.id);
       const data = response?.data;
       setPolicies(Array.isArray(data) ? data : (Array.isArray(data?.content) ? data.content : []));
     } catch (err) { setError(err.message); }
     finally { setLoading(false); }
-  };
+  }, [worker.id]);
+
+  useEffect(() => { fetchPolicies(); }, [fetchPolicies]);
 
   const openCancelConfirm = (policy) => {
     setPolicyToCancel(policy);
@@ -52,7 +52,7 @@ function Policies() {
       setCancelling(null);
       setPolicyToCancel(null);
     }
-  }, [policyToCancel, showSuccess, showError]);
+  }, [policyToCancel, showSuccess, showError, fetchPolicies]);
 
   const handleDownloadInvoice = useCallback(async (policyId) => {
     setDownloading(policyId);

@@ -13,32 +13,34 @@ function DonutChart({ segments, size = 140, thickness = 22 }) {
   const r = (size / 2) - thickness;
   const circumference = 2 * Math.PI * r;
   const total = segments.reduce((s, sg) => s + sg.value, 0) || 1;
-  let offset = 0;
+
+  let currentOffset = 0;
+  const elements = segments.map((seg, i) => {
+    const dash = (seg.value / total) * circumference;
+    const gap = circumference - dash;
+    const el = (
+      <circle
+        key={i}
+        cx={size/2} cy={size/2} r={r}
+        fill="none"
+        stroke={seg.color}
+        strokeWidth={thickness}
+        strokeDasharray={`${dash} ${gap}`}
+        strokeDashoffset={-currentOffset}
+        strokeLinecap="butt"
+        style={{ transition: 'stroke-dasharray 0.8s ease-out' }}
+      />
+    );
+    currentOffset += dash;
+    return el;
+  });
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
       <svg width={size} height={size} style={{ transform: 'rotate(-90deg)', flexShrink: 0 }}>
         <circle cx={size/2} cy={size/2} r={r}
           fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={thickness} />
-        {segments.map((seg, i) => {
-          const dash = (seg.value / total) * circumference;
-          const gap = circumference - dash;
-          const el = (
-            <circle
-              key={i}
-              cx={size/2} cy={size/2} r={r}
-              fill="none"
-              stroke={seg.color}
-              strokeWidth={thickness}
-              strokeDasharray={`${dash} ${gap}`}
-              strokeDashoffset={-offset}
-              strokeLinecap="butt"
-              style={{ transition: 'stroke-dasharray 0.8s ease-out' }}
-            />
-          );
-          offset += dash;
-          return el;
-        })}
+        {elements}
       </svg>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {segments.map((seg, i) => (
@@ -180,7 +182,6 @@ function Analytics() {
     setExporting(true);
     try {
       // Use canvas-based approach for SVG export
-      const svgs = chartsRef.current.querySelectorAll('svg');
       const canvas = document.createElement('canvas');
       canvas.width = 1200;
       canvas.height = 800;

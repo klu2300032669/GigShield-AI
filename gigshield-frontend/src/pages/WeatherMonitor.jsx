@@ -127,16 +127,16 @@ function WeatherMonitor() {
   const [searchCity, setSearchCity] = useState('');
   const [viewCity, setViewCity] = useState('');
 
-  useEffect(() => { fetchEvents(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     try {
       const response = await eventApi.getRecent();
       const data = response?.data;
       setEvents(Array.isArray(data) ? data : (Array.isArray(data?.content) ? data.content : []));
     } catch (err) { setError(err.message); }
     finally { setLoading(false); }
-  };
+  }, []);
+
+  useEffect(() => { fetchEvents(); }, [fetchEvents]);
 
   const getEventIcon = (type) => {
     switch (type) {
