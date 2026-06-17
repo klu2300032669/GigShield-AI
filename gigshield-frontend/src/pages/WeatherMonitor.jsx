@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { eventApi } from '../api/api.js';
 import { useLocation } from '../context/LocationContext.jsx';
 import { TableSkeleton } from '../components/ui/SkeletonLoader.jsx';

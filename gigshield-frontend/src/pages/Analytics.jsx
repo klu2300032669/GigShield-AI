@@ -14,8 +14,7 @@ function DonutChart({ segments, size = 140, thickness = 22 }) {
   const circumference = 2 * Math.PI * r;
   const total = segments.reduce((s, sg) => s + sg.value, 0) || 1;
 
-  let currentOffset = 0;
-  const elements = segments.map((seg, i) => {
+  const elements = segments.reduce((acc, seg, i) => {
     const dash = (seg.value / total) * circumference;
     const gap = circumference - dash;
     const el = (
@@ -26,14 +25,15 @@ function DonutChart({ segments, size = 140, thickness = 22 }) {
         stroke={seg.color}
         strokeWidth={thickness}
         strokeDasharray={`${dash} ${gap}`}
-        strokeDashoffset={-currentOffset}
+        strokeDashoffset={-acc.offset}
         strokeLinecap="butt"
         style={{ transition: 'stroke-dasharray 0.8s ease-out' }}
       />
     );
-    currentOffset += dash;
-    return el;
-  });
+    acc.elements.push(el);
+    acc.offset += dash;
+    return acc;
+  }, { elements: [], offset: 0 }).elements;
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
