@@ -33,6 +33,23 @@ public class EmailService {
         }
 
         try {
+            // Bypass Render's SMTP block using an HTTP Webhook if configured
+            String webhookUrl = System.getenv("GIGSHIELD_EMAIL_WEBHOOK");
+            if (webhookUrl != null && !webhookUrl.isBlank()) {
+                log.info("Using HTTP Webhook to send email to {}", toEmail);
+                org.springframework.web.client.RestTemplate restTemplate = new org.springframework.web.client.RestTemplate();
+                java.util.Map<String, String> payload = new java.util.HashMap<>();
+                payload.put("to", toEmail);
+                payload.put("subject", "GigShield Security: Your OTP Code");
+                payload.put("body", "Your One-Time Password (OTP) for GigShield AI is:\n\n"
+                        + otpCode + "\n\n"
+                        + "This code will expire in 5 minutes. If you did not request this, please ignore this email.");
+                
+                restTemplate.postForEntity(webhookUrl, payload, String.class);
+                log.info("Successfully sent OTP email via Webhook to {}", toEmail);
+                return;
+            }
+
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom("GigShield AI <" + fromEmail + ">");
             message.setTo(toEmail);
@@ -42,7 +59,7 @@ public class EmailService {
                     + "This code will expire in 5 minutes. If you did not request this, please ignore this email.");
 
             mailSender.send(message);
-            log.info("Successfully sent OTP email to {}", toEmail);
+            log.info("Successfully sent OTP email via SMTP to {}", toEmail);
         } catch (Exception e) {
             log.warn("Email send failed (OTP is in console above): {}", e.getMessage());
         }
