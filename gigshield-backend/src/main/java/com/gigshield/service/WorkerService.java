@@ -87,6 +87,20 @@ public class WorkerService {
         workerRepository.save(worker);
     }
 
+    @Transactional
+    public void changePassword(Long workerId, com.gigshield.dto.ChangePasswordDTO dto) {
+        Worker worker = workerRepository.findById(workerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Worker", "id", workerId));
+
+        if (!passwordEncoder.matches(dto.getCurrentPassword(), worker.getPasswordHash())) {
+            throw new AuthenticationFailedException("Current password is incorrect");
+        }
+
+        validatePasswordStrength(dto.getNewPassword());
+        worker.setPasswordHash(passwordEncoder.encode(dto.getNewPassword()));
+        workerRepository.save(worker);
+    }
+
     @Timed(value = "gigshield.worker.login", description = "Time taken to login")
     public WorkerResponseDTO login(WorkerLoginDTO dto) {
         Worker worker = workerRepository.findByEmail(dto.getEmail())

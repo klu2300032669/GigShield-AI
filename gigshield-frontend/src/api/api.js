@@ -83,6 +83,7 @@ export const workerApi = {
     otpCode: data.otpCode,
     newPassword: data.newPassword
   }),
+  changePassword: (id, data) => api.post(`/workers/${id}/change-password`, data),
 };
 
 // ---- OTP APIs ----

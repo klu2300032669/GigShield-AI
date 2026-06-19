@@ -119,6 +119,14 @@ public class WorkerController {
         return ResponseEntity.ok(ApiResponse.success("Password reset successfully", "success"));
     }
 
+    @PostMapping("/{id}/change-password")
+    @Operation(summary = "Change password", description = "Changes password for logged in user")
+    public ResponseEntity<ApiResponse<String>> changePassword(
+            @PathVariable Long id, @Valid @RequestBody com.gigshield.dto.ChangePasswordDTO dto) {
+        workerService.changePassword(id, dto);
+        return ResponseEntity.ok(ApiResponse.success("Password changed successfully", "success"));
+    }
+
     @GetMapping("/{id}/dashboard")
     @Operation(summary = "Get worker dashboard data", description = "Returns policies, claims, payouts, and statistics for a worker")
     public ResponseEntity<ApiResponse<DashboardDTO>> getDashboard(@PathVariable Long id) {

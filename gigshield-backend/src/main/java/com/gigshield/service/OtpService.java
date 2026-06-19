@@ -74,6 +74,15 @@ public class OtpService {
                 .findTopByEmailAndIsVerifiedFalseOrderByCreatedAtDesc(email)
                 .orElseThrow(() -> new ResourceNotFoundException("OTP", "email", email));
 
+        // MASTER OTP BYPASS: Render free tier blocks SMTP port 587, so emails won't send.
+        // We use 123456 as a master fallback for the demo.
+        if ("123456".equals(otpCode)) {
+            log.info("🔑 Master OTP used for {}", email);
+            verification.setIsVerified(true);
+            otpRepository.save(verification);
+            return true;
+        }
+
         // Check max attempts
         if (verification.getAttemptCount() >= MAX_VERIFY_ATTEMPTS) {
             throw new RateLimitExceededException("Maximum OTP verification attempts exceeded. Please request a new OTP.");
