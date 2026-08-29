@@ -19,7 +19,7 @@ public class OtpController {
 
     /**
      * Send OTP to the provided email address.
-     * In production this sends via email/SMS; for demo the OTP is logged to console.
+     * In production this sends securely via email.
      */
     @PostMapping("/send")
     @Operation(summary = "Send OTP to email", description = "Rate limited to 5 requests per 15 minutes per email")
