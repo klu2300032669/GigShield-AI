@@ -68,7 +68,7 @@ function AIHealthWidget() {
 
   useEffect(() => {
     let cancelled = false;
-    const AI_BASE = import.meta.env.VITE_AI_API_URL || 'https://gigshield-ai-service.onrender.com';
+    const AI_BASE = import.meta.env.VITE_AI_API_URL || 'https://gigshield-ai-na5e.onrender.com';
     fetch(`${AI_BASE}/health`, { signal: AbortSignal.timeout(4000) })
       .then(r => r.json())
       .then(() => {

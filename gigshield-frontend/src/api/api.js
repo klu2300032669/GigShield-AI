@@ -144,7 +144,7 @@ export const adminApi = {
 };
 
 // ---- AI Service APIs (direct) ----
-const AI_BASE = import.meta.env.VITE_AI_API_URL || 'https://gigshield-ai-service.onrender.com';
+const AI_BASE = import.meta.env.VITE_AI_API_URL || 'https://gigshield-ai-na5e.onrender.com';
 export const aiApi = {
   getHealth: () => axios.get(`${AI_BASE}/health`),
   getModelInfo: () => axios.get(`${AI_BASE}/models`),
