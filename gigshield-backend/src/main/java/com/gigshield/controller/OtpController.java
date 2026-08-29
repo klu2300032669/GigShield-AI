@@ -24,11 +24,11 @@ public class OtpController {
     @PostMapping("/send")
     @Operation(summary = "Send OTP to email", description = "Rate limited to 5 requests per 15 minutes per email")
     public ResponseEntity<ApiResponse<String>> sendOtp(@Valid @RequestBody OtpRequestDTO dto) {
-        String otp = otpService.generateOtp(dto.getEmail());
-        // In demo mode, we return the OTP in response for testing
+        otpService.generateOtp(dto.getEmail());
+        // OTP is sent via Email service, do NOT return it in the API response
         return ResponseEntity.ok(ApiResponse.success(
-                "OTP sent successfully to " + dto.getEmail() + ". Check backend console for the code.",
-                otp
+                "OTP sent successfully to " + dto.getEmail(),
+                null
         ));
     }
 

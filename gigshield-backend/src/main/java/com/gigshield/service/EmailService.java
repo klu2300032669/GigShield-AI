@@ -21,14 +21,10 @@ public class EmailService {
 
     @Async
     public void sendOtpEmail(String toEmail, String otpCode) {
-        // Always log to console as fallback for demo/dev
-        log.info("========================================");
-        log.info("  OTP for {}: {}", toEmail, otpCode);
-        log.info("  (Valid for 5 minutes)");
-        log.info("========================================");
+        // We no longer log the OTP to the console for security reasons
 
         if (mailSender == null) {
-            log.warn("JavaMailSender not configured — OTP printed to console only.");
+            log.warn("JavaMailSender not configured — OTP could not be sent.");
             return;
         }
 
@@ -61,7 +57,7 @@ public class EmailService {
             mailSender.send(message);
             log.info("Successfully sent OTP email via SMTP to {}", toEmail);
         } catch (Exception e) {
-            log.warn("Email send failed (OTP is in console above): {}", e.getMessage());
+            log.warn("Email send failed: {}", e.getMessage());
         }
     }
 
