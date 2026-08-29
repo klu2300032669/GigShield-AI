@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AdminIpFilter extends OncePerRequestFilter {
 
+    private final Set<String> whitelistedIps;
     private final boolean enabled;
 
     public AdminIpFilter(
