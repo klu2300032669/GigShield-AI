@@ -24,20 +24,10 @@ from schemas import (  # type: ignore
     PremiumPredictionRequest, PremiumPredictionResponse
 )
 
-# Optional Advanced Libraries
-try:
-    import shap  # type: ignore
-    HAS_SHAP = True
-except ImportError:
-    HAS_SHAP = False
-
-try:
-    from transformers import pipeline  # type: ignore
-    HAS_TRANSFORMERS = True
-    nlp_pipeline = pipeline("sentiment-analysis", model="distilbert-base-uncased")
-except Exception:
-    HAS_TRANSFORMERS = False
-    nlp_pipeline = None
+# Optional Advanced Libraries - DISABLED FOR RENDER FREE TIER (Memory Limits)
+HAS_SHAP = False
+HAS_TRANSFORMERS = False
+nlp_pipeline = None
 
 # Global State Dictionary
 app_state = {
