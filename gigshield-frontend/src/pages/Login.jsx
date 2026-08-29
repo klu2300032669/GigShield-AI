@@ -47,15 +47,15 @@ function Login() {
   };
 
   return (
-    <div className="auth-layout">
-      <div className="auth-hero">
+    <div className="auth-layout" style={{
+      background: 'radial-gradient(circle at center, #0f172a 0%, #020617 100%)',
+      minHeight: '100vh', display: 'flex'
+    }}>
+      <div className="auth-hero" style={{ position: 'relative', overflow: 'hidden', padding: '3rem', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         {/* Animated floating shapes */}
         <div className="auth-floating-shapes" aria-hidden="true">
-          <div className="auth-shape auth-shape-1"></div>
-          <div className="auth-shape auth-shape-2"></div>
-          <div className="auth-shape auth-shape-3"></div>
-          <div className="auth-shape auth-shape-4"></div>
-          <div className="auth-shape auth-shape-5"></div>
+          <div className="auth-shape auth-shape-1" style={{ position: 'absolute', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(16,185,129,0.15) 0%, transparent 70%)', top: '-10%', left: '-10%', filter: 'blur(40px)', animation: 'pulse 8s infinite alternate' }}></div>
+          <div className="auth-shape auth-shape-2" style={{ position: 'absolute', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(56,189,248,0.1) 0%, transparent 70%)', bottom: '-20%', right: '-10%', filter: 'blur(60px)', animation: 'pulse 10s infinite alternate-reverse' }}></div>
         </div>
 
         <div className="auth-hero-content">
