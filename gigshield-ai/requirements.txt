@@ -10,5 +10,3 @@ shap
 lime
 statsmodels
 pmdarima
-torch
-transformers
