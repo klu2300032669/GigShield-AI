@@ -31,3 +31,18 @@ ON CONFLICT (email) DO NOTHING;
 UPDATE workers SET version = 0 WHERE version IS NULL;
 ALTER TABLE workers ALTER COLUMN version SET DEFAULT 0;
 ALTER TABLE workers ALTER COLUMN version SET NOT NULL;
+
+-- ============================================
+-- Seed Environmental Events for Demo
+-- ============================================
+INSERT INTO environmental_events (event_type, city, severity, rainfall_mm, temperature_c, aqi, event_timestamp, source_api)
+VALUES
+('HEAVY_RAIN', 'Mumbai', 'HIGH', 85.5, 28.0, 62, CURRENT_TIMESTAMP - INTERVAL '2 hours', 'Open-Meteo'),
+('HEAVY_RAIN', 'Mumbai', 'CRITICAL', 120.0, 26.0, 58, CURRENT_TIMESTAMP - INTERVAL '6 hours', 'Open-Meteo'),
+('EXTREME_HEAT', 'Delhi', 'HIGH', 0.0, 46.5, 180, CURRENT_TIMESTAMP - INTERVAL '3 hours', 'Open-Meteo'),
+('HIGH_POLLUTION', 'Delhi', 'CRITICAL', 0.0, 38.0, 420, CURRENT_TIMESTAMP - INTERVAL '1 hour', 'Open-Meteo'),
+('EXTREME_HEAT', 'Hyderabad', 'HIGH', 0.0, 43.8, 95, CURRENT_TIMESTAMP - INTERVAL '4 hours', 'Open-Meteo'),
+('HEAVY_RAIN', 'Bangalore', 'HIGH', 65.0, 24.0, 45, CURRENT_TIMESTAMP - INTERVAL '5 hours', 'Open-Meteo'),
+('HIGH_POLLUTION', 'Kolkata', 'HIGH', 2.0, 34.0, 310, CURRENT_TIMESTAMP - INTERVAL '8 hours', 'Open-Meteo'),
+('HEAVY_RAIN', 'Chennai', 'HIGH', 95.0, 27.0, 55, CURRENT_TIMESTAMP - INTERVAL '12 hours', 'Open-Meteo')
+ON CONFLICT DO NOTHING;

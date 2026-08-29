@@ -144,11 +144,12 @@ export const adminApi = {
 };
 
 // ---- AI Service APIs (direct) ----
+const AI_BASE = import.meta.env.VITE_AI_API_URL || 'https://gigshield-ai-service.onrender.com';
 export const aiApi = {
-  getHealth: () => axios.get('http://localhost:8000/health'),
-  getModelInfo: () => axios.get('http://localhost:8000/model-info'),
-  getMetrics: () => axios.get('http://localhost:8000/metrics'),
-  analyzeFraud: (data) => axios.post('http://localhost:8000/detect-fraud', data),
+  getHealth: () => axios.get(`${AI_BASE}/health`),
+  getModelInfo: () => axios.get(`${AI_BASE}/models`),
+  getMetrics: () => axios.get(`${AI_BASE}/metrics/historical`),
+  analyzeFraud: (data) => axios.post(`${AI_BASE}/detect-fraud`, data),
 };
 
 // ---- Payment APIs ----

@@ -23,19 +23,32 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AdminIpFilter extends OncePerRequestFilter {
 
-    private final Set<String> whitelistedIps;
+    private final boolean enabled;
 
     public AdminIpFilter(
-            @Value("${gigshield.admin.ip-whitelist:127.0.0.1,0:0:0:0:0:0:0:1,::1}") String ipWhitelist) {
-        this.whitelistedIps = Arrays.stream(ipWhitelist.split(","))
-                .map(String::trim)
-                .collect(Collectors.toSet());
-        log.info("Admin IP whitelist configured: {}", this.whitelistedIps);
+            @Value("${gigshield.admin.ip-whitelist:}") String ipWhitelist) {
+        if (ipWhitelist == null || ipWhitelist.isBlank()) {
+            // Empty whitelist = disabled (rely on JWT role-based auth instead)
+            this.whitelistedIps = Set.of();
+            this.enabled = false;
+            log.info("Admin IP filter DISABLED — relying on JWT role-based security");
+        } else {
+            this.whitelistedIps = Arrays.stream(ipWhitelist.split(","))
+                    .map(String::trim)
+                    .collect(Collectors.toSet());
+            this.enabled = true;
+            log.info("Admin IP whitelist configured: {}", this.whitelistedIps);
+        }
     }
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
+        if (!enabled) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String clientIp = getClientIp(request);
 
         if (!whitelistedIps.contains(clientIp)) {

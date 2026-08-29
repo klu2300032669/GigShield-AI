@@ -68,7 +68,8 @@ function AIHealthWidget() {
 
   useEffect(() => {
     let cancelled = false;
-    fetch('http://localhost:8000/health', { signal: AbortSignal.timeout(4000) })
+    const AI_BASE = import.meta.env.VITE_AI_API_URL || 'https://gigshield-ai-service.onrender.com';
+    fetch(`${AI_BASE}/health`, { signal: AbortSignal.timeout(4000) })
       .then(r => r.json())
       .then(() => {
         if (!cancelled) setStatus('online');
