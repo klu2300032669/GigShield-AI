@@ -120,34 +120,54 @@ def load_active_models():
     logger.info(f"Loading models from {base_path}...")
     
     # Load Risk Model (XGBoost)
-    if os.path.exists(os.path.join(base_path, "risk_model.joblib")):
-        risk_model = joblib.load(os.path.join(base_path, "risk_model.joblib"))
-    else:
+    try:
+        if os.path.exists(os.path.join(base_path, "risk_model.joblib")):
+            risk_model = joblib.load(os.path.join(base_path, "risk_model.joblib"))
+        else:
+            risk_model = None
+    except Exception as e:
+        logger.error(f"Failed to load risk_model: {e}")
         risk_model = None
         
     # Load Fraud Model (RandomForest)
-    if os.path.exists(os.path.join(base_path, "fraud_model.joblib")):
-        fraud_model = joblib.load(os.path.join(base_path, "fraud_model.joblib"))
-    else:
+    try:
+        if os.path.exists(os.path.join(base_path, "fraud_model.joblib")):
+            fraud_model = joblib.load(os.path.join(base_path, "fraud_model.joblib"))
+        else:
+            fraud_model = None
+    except Exception as e:
+        logger.error(f"Failed to load fraud_model: {e}")
         fraud_model = None
 
     # Load Claim Amount Model (GradientBoosting)
-    if os.path.exists(os.path.join(base_path, "claim_amount_model.joblib")):
-        claim_amount_model = joblib.load(os.path.join(base_path, "claim_amount_model.joblib"))
-    else:
+    try:
+        if os.path.exists(os.path.join(base_path, "claim_amount_model.joblib")):
+            claim_amount_model = joblib.load(os.path.join(base_path, "claim_amount_model.joblib"))
+        else:
+            claim_amount_model = None
+    except Exception as e:
+        logger.error(f"Failed to load claim_amount_model: {e}")
         claim_amount_model = None
 
     # Load Anomaly Model (IsolationForest)
-    if os.path.exists(os.path.join(base_path, "anomaly_model.joblib")):
-        anomaly_model = joblib.load(os.path.join(base_path, "anomaly_model.joblib"))
-    else:
+    try:
+        if os.path.exists(os.path.join(base_path, "anomaly_model.joblib")):
+            anomaly_model = joblib.load(os.path.join(base_path, "anomaly_model.joblib"))
+        else:
+            anomaly_model = None
+    except Exception as e:
+        logger.error(f"Failed to load anomaly_model: {e}")
         anomaly_model = None
-
-    # Metadata
-    if os.path.exists(os.path.join(base_path, "metadata.json")):
-        with open(os.path.join(base_path, "metadata.json"), 'r') as f:
-            model_metadata = json.load(f)
-    else:
+        
+    # Load Metadata
+    try:
+        if os.path.exists(os.path.join(base_path, "metadata.json")):
+            with open(os.path.join(base_path, "metadata.json"), 'r') as f:
+                model_metadata = json.load(f)
+        else:
+            model_metadata = {}
+    except Exception as e:
+        logger.error(f"Failed to load metadata: {e}")
         model_metadata = {}
 
     # Load Feedback
