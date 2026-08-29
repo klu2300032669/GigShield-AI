@@ -40,6 +40,16 @@ public class StripePaymentServiceImpl implements PaymentService {
                 request.getCurrency() != null ? request.getCurrency() : defaultCurrency);
 
         try {
+            // DEMO MODE BYPASS: If no real Stripe key is provided, fake a successful payment intent for demo purposes.
+            if ("sk_test_placeholder".equals(stripeApiKey) || stripeApiKey == null) {
+                log.info("⚠️ No real Stripe API key found. Using DEMO MODE for payment intent.");
+                return PaymentResponseDTO.builder()
+                        .paymentIntentId("pi_demo_" + java.util.UUID.randomUUID().toString().substring(0, 8))
+                        .clientSecret("demo_secret_" + java.util.UUID.randomUUID().toString())
+                        .status("REQUIRES_PAYMENT_METHOD")
+                        .build();
+            }
+
             // Stripe expects amount in the smallest currency unit (paise for INR, cents for USD)
             long amountInSmallestUnit = request.getAmount()
                     .multiply(java.math.BigDecimal.valueOf(100))
