@@ -201,6 +201,7 @@ function PaymentModal({ plan, workerId, onClose, onSuccess }) {
           setInitError('Could not initialize payment gateway. Please ensure Stripe API keys are configured correctly.');
         }
       } catch (err) {
+        console.error(err);
         setInitError('Failed to connect to payment server. Please verify your connection and Stripe configuration.');
       } finally {
         setIsLoading(false);

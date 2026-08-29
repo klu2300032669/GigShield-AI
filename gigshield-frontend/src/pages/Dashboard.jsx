@@ -263,9 +263,6 @@ function Dashboard() {
   const claimAmountData = recentClaims.slice(-10).map(c => Number(c.claimAmount) || 0);
   const riskScoreData   = recentClaims.slice(-10).map(c => Number(c.riskScore) || 0);
 
-  // Check if worker's registered city differs from detected city
-  const cityMismatch = worker?.city && worker.city.toLowerCase() !== city.toLowerCase();
-
   return (
     <div>
       {/* Payment Success Toast */}
