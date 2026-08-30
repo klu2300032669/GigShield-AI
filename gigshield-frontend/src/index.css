@@ -12,11 +12,18 @@
   --primary-light: #34d399;
   --secondary: #f59e0b;
   --accent: #fb7185;
+  
   /* Modern Dark Theme Palette */
-  --bg-dark: #07090f;
+  --bg-primary: #07090f;
+  --bg-secondary: rgba(15, 23, 42, 0.4);
   --bg-card: rgba(15, 23, 42, 0.6);
   --bg-sidebar: rgba(10, 15, 30, 0.7);
   --bg-hover: rgba(255, 255, 255, 0.05);
+  
+  /* Text */
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
   
   /* Neon Accents */
   --primary: #3b82f6;

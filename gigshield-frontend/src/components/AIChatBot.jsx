@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Bot, User, Sparkles } from 'lucide-react';
+import { MessageCircle, X, Send, Bot, User, Sparkles, Mic } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 
 const AI_BASE = import.meta.env.VITE_AI_API_URL || 'https://gigshield-ai-na5e.onrender.com';
@@ -11,9 +11,33 @@ function AIChatBot() {
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const [suggestions, setSuggestions] = useState(['What plans are available?', 'How does AI risk prediction work?', 'How do I file a claim?']);
   const bottomRef = useRef(null);
   const { user } = useAuth();
+  
+  const startListening = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Voice input is not supported in this browser. Please use Chrome.");
+      return;
+    }
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    recognition.onstart = () => setIsListening(true);
+    recognition.onend = () => setIsListening(false);
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      setInput(transcript);
+      // Auto send after speaking
+      sendMessage(transcript);
+    };
+
+    recognition.start();
+  };
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -179,6 +203,20 @@ function AIChatBot() {
                 color: 'white', fontSize: '0.88rem', outline: 'none',
               }}
             />
+            <button
+              type="button"
+              onClick={startListening}
+              style={{
+                padding: '10px', borderRadius: '12px',
+                background: isListening ? 'rgba(239,68,68,0.2)' : 'rgba(255,255,255,0.05)',
+                border: isListening ? '1px solid rgba(239,68,68,0.5)' : 'none',
+                cursor: 'pointer', color: isListening ? '#ef4444' : 'white',
+                animation: isListening ? 'pulse 1.5s infinite' : 'none'
+              }}
+              title="Speak to AI"
+            >
+              <Mic size={18} />
+            </button>
             <button type="submit" disabled={loading || !input.trim()} style={{
               padding: '10px', borderRadius: '12px',
               background: input.trim() ? 'linear-gradient(135deg, #10b981, #14b8a6)' : 'rgba(255,255,255,0.05)',
