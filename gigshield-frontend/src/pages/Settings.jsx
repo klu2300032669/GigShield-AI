@@ -12,6 +12,50 @@ import {
 
 function Settings() {
   const { worker, updateWorkerProfile } = useAuth();
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [profileForm, setProfileForm] = useState({ fullName: worker?.fullName || '', phone: worker?.phone || '' });
+  const [profileLoading, setProfileLoading] = useState(false);
+  const { showSuccess, showError } = useToast();
+
+  const [passwordForm, setPasswordForm] = useState({ current: '', new: '', confirm: '' });
+  const [passwordLoading, setPasswordLoading] = useState(false);
+
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    if (passwordForm.new !== passwordForm.confirm) {
+      showError('Validation Error', 'New passwords do not match');
+      return;
+    }
+    setPasswordLoading(true);
+    try {
+      await workerApi.changePassword(worker.id, {
+        currentPassword: passwordForm.current,
+        newPassword: passwordForm.new
+      });
+      showSuccess('Success', 'Your password has been updated securely.');
+      setPasswordForm({ current: '', new: '', confirm: '' });
+    } catch (err) {
+      showError('Error', err.response?.data?.message || 'Failed to update password');
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
+
+  const handleProfileSave = async (e) => {
+    e.preventDefault();
+    setProfileLoading(true);
+    try {
+      const res = await workerApi.updateWorker(worker.id, { fullName: profileForm.fullName, phone: profileForm.phone });
+      updateWorkerProfile(res.data.data);
+      showSuccess('Success', 'Profile updated successfully.');
+      setIsEditingProfile(false);
+    } catch (err) {
+      showError('Error', 'Failed to update profile.');
+    } finally {
+      setProfileLoading(false);
+    }
+  };
+
   const {
     city, detectLocation, isDetecting, lastUpdated,
     accuracy, accuracyLevel, permissionState, locationHistory, locationError
