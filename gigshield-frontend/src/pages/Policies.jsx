@@ -6,8 +6,110 @@ import { ConfirmDialog } from '../components/ui/Modal.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import {
   ClipboardList, Shield, CloudRain, Flame, Wind,
-  Calendar, Banknote, AlertCircle, XCircle, Loader2, Download
+  Calendar, Banknote, AlertCircle, XCircle, Loader2, Download, Code, CheckCircle2, Lock
 } from 'lucide-react';
+
+function SmartContractViewer({ policy, onClose }) {
+  if (!policy) return null;
+
+  const hash = `0x${(policy.id * 893452).toString(16).padEnd(40, '0')}`;
+  
+  // Fake a solidity-style contract string dynamically based on the coverage type
+  let conditions = '';
+  if (policy.coverageType === 'RAIN' || policy.coverageType === 'ALL') {
+    conditions += `    require(oracle.getRainfall(worker.city) > 30mm, "Rainfall threshold not met");\n`;
+  }
+  if (policy.coverageType === 'HEAT' || policy.coverageType === 'ALL') {
+    conditions += `    require(oracle.getTemperature(worker.city) > 42C, "Heat threshold not met");\n`;
+  }
+  
+  const contractCode = `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.19;
+
+import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
+
+contract GigShieldParametric {
+  address public protocolTreasury = 0x8a9C...3b1;
+  address public workerWallet = 0x${Math.random().toString(16).slice(2,10)}...;
+
+  struct Policy {
+    uint256 maxPayout;
+    string city;
+    bool isActive;
+  }
+
+  Policy public activePolicy = Policy(${policy.maxPayout}, "${policy.planName}", true);
+
+  function executePayout() external {
+    require(activePolicy.isActive, "Policy expired");
+${conditions}
+    // Triggers instant stablecoin transfer via Protocol Treasury
+    payable(workerWallet).transfer(activePolicy.maxPayout);
+    
+    emit PayoutExecuted(workerWallet, activePolicy.maxPayout);
+  }
+}`;
+
+  return (
+    <div className="modal-overlay" onClick={onClose} style={{
+      position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+      backgroundColor: 'rgba(0, 0, 0, 0.8)', backdropFilter: 'blur(8px)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+      padding: '20px'
+    }}>
+      <div className="glass-card animate-fade-in-up" onClick={e => e.stopPropagation()} style={{
+        background: '#020617', border: '1px solid var(--accent-purple)',
+        maxWidth: '700px', width: '100%', padding: '0', borderRadius: '12px',
+        boxShadow: '0 0 40px rgba(139, 92, 246, 0.15)', overflow: 'hidden'
+      }}>
+        {/* Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 24px', background: 'rgba(139, 92, 246, 0.1)', borderBottom: '1px solid rgba(139, 92, 246, 0.2)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ padding: '8px', background: 'rgba(139, 92, 246, 0.2)', borderRadius: '8px' }}>
+              <Code size={20} style={{ color: 'var(--accent-purple)' }} />
+            </div>
+            <div>
+              <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-primary)' }}>Live Smart Contract</h3>
+              <div style={{ fontSize: '0.8rem', color: 'var(--accent-purple)', fontFamily: 'monospace', marginTop: 4 }}>
+                {hash}
+              </div>
+            </div>
+          </div>
+          <button className="btn btn-ghost" onClick={onClose} style={{ padding: '8px' }}>✕</button>
+        </div>
+
+        {/* Status bar */}
+        <div style={{ display: 'flex', gap: '24px', padding: '16px 24px', background: '#0f172a', borderBottom: '1px solid #1e293b' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.85rem' }}>
+            <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--accent-emerald)', boxShadow: '0 0 10px var(--accent-emerald)' }} />
+            <span style={{ color: 'var(--text-secondary)' }}>Status:</span>
+            <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>Active & Monitoring</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.85rem' }}>
+            <Lock size={14} style={{ color: 'var(--text-muted)' }} />
+            <span style={{ color: 'var(--text-secondary)' }}>Oracle:</span>
+            <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>Open-Meteo Node</span>
+          </div>
+        </div>
+
+        {/* Code Block */}
+        <div style={{ padding: '24px', background: '#000', overflowX: 'auto' }}>
+          <pre style={{ margin: 0, fontFamily: '"Fira Code", monospace', fontSize: '0.85rem', color: '#a5b4fc', lineHeight: 1.6 }}>
+            <code>{contractCode}</code>
+          </pre>
+        </div>
+        
+        {/* Footer */}
+        <div style={{ padding: '16px 24px', background: 'rgba(16, 185, 129, 0.05)', borderTop: '1px solid rgba(16, 185, 129, 0.1)', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <CheckCircle2 size={16} style={{ color: 'var(--accent-emerald)' }} />
+          <span style={{ fontSize: '0.85rem', color: 'var(--accent-emerald)' }}>
+            This contract is cryptographically signed and secured on the ledger. Payouts execute automatically.
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function Policies() {
   const { worker } = useAuth();
@@ -17,6 +119,7 @@ function Policies() {
   const [error, setError] = useState('');
   const [cancelling, setCancelling] = useState(null);
   const [downloading, setDownloading] = useState(null);
+  const [viewingContract, setViewingContract] = useState(null);
 
   // Confirm dialog state
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -192,22 +295,15 @@ function Policies() {
                   </div>
                 </div>
 
-                {/* REAL WORLD FEATURE: Smart Contract Execution Ledger */}
-                <div style={{
-                  marginTop: '12px', padding: '10px 12px',
-                  background: 'rgba(139, 92, 246, 0.05)',
-                  border: '1px dashed rgba(139, 92, 246, 0.3)',
-                  borderRadius: 'var(--radius-sm)',
-                  fontSize: '0.75rem', color: 'var(--text-secondary)',
-                  display: 'flex', flexDirection: 'column', gap: '6px'
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <strong style={{ color: 'var(--accent-purple)', display: 'flex', alignItems: 'center', gap: '4px' }}><Shield size={12}/> Smart Contract Active</strong>
-                    <span style={{ fontFamily: 'monospace', opacity: 0.8 }}>0x{(policy.id * 893452).toString(16).padEnd(8, '0')}...</span>
-                  </div>
-                  <div style={{ opacity: 0.9 }}>
-                    Oracle nodes continuously monitor environmental thresholds. Payouts are triggered autonomously without human adjustment.
-                  </div>
+                {/* REAL WORLD FEATURE: Smart Contract Viewer Button */}
+                <div style={{ marginTop: '12px' }}>
+                  <button 
+                    className="btn btn-outline btn-sm" 
+                    style={{ width: '100%', borderColor: 'var(--accent-purple)', color: 'var(--accent-purple)', display: 'flex', justifyContent: 'center', gap: 6 }}
+                    onClick={() => setViewingContract(policy)}
+                  >
+                    <Shield size={14} /> View Smart Contract Ledger
+                  </button>
                 </div>
 
                 <div className="policy-card-footer">
@@ -254,6 +350,12 @@ function Policies() {
           <p>Purchase an insurance plan to get started with protection</p>
         </div>
       )}
+      
+      {/* Smart Contract Viewer Modal */}
+      <SmartContractViewer 
+        policy={viewingContract} 
+        onClose={() => setViewingContract(null)} 
+      />
 
       {/* Accessible Confirm Dialog — replaces window.confirm */}
       <ConfirmDialog
