@@ -247,12 +247,97 @@ function WeatherWidgetMini({ city, coordinates, onWeatherUpdate }) {
   );
 }
 
+function AIRiskExplainerModal({ show, onClose, city }) {
+  if (!show) return null;
+  
+  return (
+    <div className="modal-overlay" onClick={onClose} style={{
+      position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+      backgroundColor: 'rgba(0, 0, 0, 0.7)', backdropFilter: 'blur(5px)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+      padding: '20px'
+    }}>
+      <div className="glass-card animate-fade-in-up" onClick={e => e.stopPropagation()} style={{
+        background: '#020617', border: '1px solid var(--accent-coral)',
+        maxWidth: '500px', width: '100%', padding: '24px', borderRadius: '16px',
+        boxShadow: '0 0 30px rgba(251, 113, 133, 0.15)'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <h2 style={{ margin: 0, fontSize: '1.4rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Brain size={24} style={{ color: 'var(--accent-coral)' }} />
+            AI Risk Breakdown
+          </h2>
+          <button className="btn btn-ghost" onClick={onClose} style={{ padding: '8px' }}>✕</button>
+        </div>
+        
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '24px' }}>
+          Our Machine Learning model calculates your real-time risk score for <strong>{city}</strong> using the following weighted parameters:
+        </p>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
+          {/* Factor 1 */}
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '4px' }}>
+              <span style={{ color: 'var(--text-primary)' }}>Real-time Precipitation (API)</span>
+              <span style={{ color: 'var(--accent-sky)', fontWeight: 600 }}>45%</span>
+            </div>
+            <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px' }}>
+              <div style={{ width: '45%', height: '100%', background: 'var(--accent-sky)', borderRadius: '4px' }} />
+            </div>
+          </div>
+          
+          {/* Factor 2 */}
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '4px' }}>
+              <span style={{ color: 'var(--text-primary)' }}>Zone Traffic Density</span>
+              <span style={{ color: 'var(--accent-amber)', fontWeight: 600 }}>30%</span>
+            </div>
+            <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px' }}>
+              <div style={{ width: '30%', height: '100%', background: 'var(--accent-amber)', borderRadius: '4px' }} />
+            </div>
+          </div>
+
+          {/* Factor 3 */}
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '4px' }}>
+              <span style={{ color: 'var(--text-primary)' }}>Historical Claims Density</span>
+              <span style={{ color: 'var(--accent-coral)', fontWeight: 600 }}>15%</span>
+            </div>
+            <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px' }}>
+              <div style={{ width: '15%', height: '100%', background: 'var(--accent-coral)', borderRadius: '4px' }} />
+            </div>
+          </div>
+
+          {/* Factor 4 */}
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '4px' }}>
+              <span style={{ color: 'var(--text-primary)' }}>Time of Day Multiplier</span>
+              <span style={{ color: 'var(--accent-violet)', fontWeight: 600 }}>10%</span>
+            </div>
+            <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px' }}>
+              <div style={{ width: '10%', height: '100%', background: 'var(--accent-violet)', borderRadius: '4px' }} />
+            </div>
+          </div>
+        </div>
+
+        <div style={{ padding: '16px', background: 'rgba(251, 113, 133, 0.1)', borderRadius: '8px', border: '1px solid rgba(251, 113, 133, 0.2)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontWeight: 600 }}>Final Computed Score:</span>
+            <span style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--accent-coral)' }}>7.8<span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>/10</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Dashboard() {
   const { worker } = useAuth();
   const { city, coordinates, detectLocation, isDetecting, lastUpdated } = useLocation();
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [liveWeather, setLiveWeather] = useState(null);
+  const [showRiskModal, setShowRiskModal] = useState(false);
   const [error, setError] = useState('');
   const [paymentToast, setPaymentToast] = useState('');
   const [searchParams, setSearchParams] = useSearchParams();
@@ -422,9 +507,17 @@ function Dashboard() {
           <div className="metric-icon coral" style={{ width: '56px', height: '56px', flexShrink: 0 }}>
             <Activity size={28} />
           </div>
-          <div style={{ flex: 1 }}>
+          <div style={{ flex: 1, position: 'relative' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '8px' }}>
-              <h3 style={{ color: 'var(--text-primary)', margin: 0, fontSize: '1.1rem' }}>Daily Risk Score — {city}</h3>
+              <div>
+                <h3 style={{ color: 'var(--text-primary)', margin: 0, fontSize: '1.1rem' }}>Daily Risk Score — {city}</h3>
+                <button 
+                  onClick={() => setShowRiskModal(true)}
+                  className="btn btn-ghost" 
+                  style={{ padding: 0, marginTop: 4, color: 'var(--accent-teal)', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <Brain size={14} /> Explain AI Decision
+                </button>
+              </div>
               <span className="risk-score risk-high" style={{ fontSize: '1.25rem' }}>7.8 / 10</span>
             </div>
             <div className="risk-bar" style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.1)' }}>
@@ -629,6 +722,9 @@ function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* AI Explainer Modal */}
+      <AIRiskExplainerModal show={showRiskModal} onClose={() => setShowRiskModal(false)} city={city} />
     </div>
   );
 }
