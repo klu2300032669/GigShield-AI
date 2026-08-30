@@ -8,6 +8,43 @@ import {
   Search, AlertTriangle, TrendingUp
 } from 'lucide-react';
 
+function AIRiskRadar() {
+  return (
+    <div className="glass-card" style={{ position: 'relative', height: '180px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#020617', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+      <style>{`
+        @keyframes radar-spin { 100% { transform: rotate(360deg); } }
+        @keyframes radar-ping { 0% { transform: scale(1); opacity: 1; } 75%, 100% { transform: scale(2.5); opacity: 0; } }
+      `}</style>
+      
+      <div style={{ position: 'absolute', top: 12, left: 16, zIndex: 10, color: '#10b981', fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
+        <Activity size={14} style={{ animation: 'radar-ping 2s infinite' }} /> AI Threat Radar
+      </div>
+      
+      {/* Radar Circles */}
+      <div style={{ position: 'absolute', width: 140, height: 140, borderRadius: '50%', border: '1px solid rgba(16, 185, 129, 0.1)' }} />
+      <div style={{ position: 'absolute', width: 90, height: 90, borderRadius: '50%', border: '1px solid rgba(16, 185, 129, 0.2)' }} />
+      <div style={{ position: 'absolute', width: 40, height: 40, borderRadius: '50%', border: '1px solid rgba(16, 185, 129, 0.4)' }} />
+      
+      {/* Radar Sweep */}
+      <div style={{
+        position: 'absolute', width: '70px', height: '70px', top: '50%', left: '50%',
+        transformOrigin: '0 0',
+        background: 'linear-gradient(45deg, rgba(16, 185, 129, 0.6) 0%, transparent 60%)',
+        animation: 'radar-spin 3s linear infinite'
+      }} />
+
+      {/* Blips */}
+      <div style={{ position: 'absolute', top: '30%', left: '40%', width: 6, height: 6, background: '#f59e0b', borderRadius: '50%', boxShadow: '0 0 10px #f59e0b', animation: 'radar-ping 2s infinite' }} />
+      <div style={{ position: 'absolute', top: '65%', left: '70%', width: 6, height: 6, background: '#ef4444', borderRadius: '50%', boxShadow: '0 0 10px #ef4444', animation: 'radar-ping 2.5s infinite 1s' }} />
+      <div style={{ position: 'absolute', top: '55%', left: '25%', width: 6, height: 6, background: '#10b981', borderRadius: '50%', boxShadow: '0 0 10px #10b981', animation: 'radar-ping 3s infinite 0.5s' }} />
+      
+      <div style={{ position: 'absolute', bottom: 12, right: 16, zIndex: 10, color: 'var(--text-muted)', fontSize: '0.7rem' }}>
+        Live Oracle Node Scanning...
+      </div>
+    </div>
+  );
+}
+
 // 7-day forecast mini chart
 function ForecastChart({ city, coordinates }) {
   const [forecast, setForecast] = useState(null);
@@ -281,6 +318,11 @@ function WeatherMonitor() {
 
       {/* 7-Day Forecast */}
       <ForecastChart city={displayCity} coordinates={displayCity === city ? coordinates : null} />
+
+      {/* Global AI Risk Radar */}
+      <div className="animate-fade-in-up" style={{ marginTop: 'var(--space-lg)', animationDelay: '150ms' }}>
+        <AIRiskRadar />
+      </div>
 
       {sortedEvents.length > 0 ? (
         <div className="weather-grid stagger-children" style={{ marginTop: 'var(--space-lg)' }}>
