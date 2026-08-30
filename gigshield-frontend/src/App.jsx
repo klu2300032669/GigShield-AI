@@ -11,6 +11,7 @@ import LoadingSpinner from './components/LoadingSpinner.jsx';
 import AIChatBot from './components/AIChatBot.jsx';
 
 // ── Code-split every page with React.lazy ──────────────────────────────────
+const Landing        = lazy(() => import('./pages/Landing.jsx'));
 const Login          = lazy(() => import('./pages/Login.jsx'));
 const Register       = lazy(() => import('./pages/Register.jsx'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword.jsx'));
@@ -168,8 +169,8 @@ function App() {
           </AdminRoute>
         } />
 
-        {/* Redirects */}
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        {/* Landing Page */}
+        <Route path="/" element={<Suspense fallback={<AuthFallback />}><Landing /></Suspense>} />
 
         {/* 404 */}
         <Route path="*" element={
