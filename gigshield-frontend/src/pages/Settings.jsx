@@ -45,7 +45,15 @@ function Settings() {
     e.preventDefault();
     setProfileLoading(true);
     try {
-      const res = await workerApi.updateWorker(worker.id, { fullName: profileForm.fullName, phone: profileForm.phone });
+      const payload = {
+        fullName: profileForm.fullName,
+        phone: profileForm.phone,
+        email: worker.email || 'worker@example.com',
+        password: 'unchanged_dummy_password', // Backend ignores this for updates, but @Valid requires it
+        city: worker.city || 'Mumbai',
+        platformName: worker.platformName || 'GigShield'
+      };
+      const res = await workerApi.updateWorker(worker.id, payload);
       updateWorkerProfile(res.data);
       showSuccess('Success', 'Profile updated successfully.');
       setIsEditingProfile(false);
