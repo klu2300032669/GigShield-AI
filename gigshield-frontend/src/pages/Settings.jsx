@@ -11,70 +11,29 @@ import {
 } from 'lucide-react';
 
 function Settings() {
-  const { worker } = useAuth();
+  const { worker, updateWorkerProfile } = useAuth();
   const {
     city, detectLocation, isDetecting, lastUpdated,
     accuracy, accuracyLevel, permissionState, locationHistory, locationError
   } = useLocation();
 
-  const [notifPrefs, setNotifPrefs] = useState({
-    emailAlerts: true,
-    pushNotifications: true,
-    smsAlerts: false,
-    weeklyDigest: true,
-    claimUpdates: true,
-    weatherAlerts: true,
-    notificationSound: true,
+  const [notifPrefs, setNotifPrefs] = useState(() => {
+    const saved = localStorage.getItem('gigshield_notif_prefs');
+    return saved ? JSON.parse(saved) : {
+      emailAlerts: true,
+      pushNotifications: true,
+      claimUpdates: true,
+      weatherAlerts: true,
+      notificationSound: true,
+    };
   });
 
-  const [requestingPush, setRequestingPush] = useState(false);
-  const [passwordForm, setPasswordForm] = useState({ current: '', new: '', confirm: '' });
-  const [passwordLoading, setPasswordLoading] = useState(false);
-  const { showSuccess, showError } = useToast();
-
-  const handlePasswordChange = async (e) => {
-    e.preventDefault();
-    if (passwordForm.new !== passwordForm.confirm) {
-      showError('Validation Error', 'New passwords do not match');
-      return;
-    }
-    setPasswordLoading(true);
-    try {
-      await workerApi.changePassword(worker.id, {
-        currentPassword: passwordForm.current,
-        newPassword: passwordForm.new
-      });
-      showSuccess('Success', 'Your password has been updated securely.');
-      setPasswordForm({ current: '', new: '', confirm: '' });
-    } catch (err) {
-      showError('Error', err.response?.data?.message || 'Failed to update password');
-    } finally {
-      setPasswordLoading(false);
-    }
-  };
-
-
   const togglePref = (key) => {
-    setNotifPrefs(prev => ({ ...prev, [key]: !prev[key] }));
-  };
-
-  const handleRequestPushPermission = async () => {
-    if (!('Notification' in window)) return;
-    setRequestingPush(true);
-    try {
-      const permission = await Notification.requestPermission();
-      if (permission === 'granted') {
-        setNotifPrefs(prev => ({ ...prev, pushNotifications: true }));
-        new Notification('GigShield AI', {
-          body: 'Push notifications enabled! You will receive real-time alerts.',
-          icon: '/vite.svg',
-        });
-      }
-    } catch (err) {
-      console.error('Push permission error:', err);
-    } finally {
-      setRequestingPush(false);
-    }
+    setNotifPrefs(prev => {
+      const next = { ...prev, [key]: !prev[key] };
+      localStorage.setItem('gigshield_notif_prefs', JSON.stringify(next));
+      return next;
+    });
   };
 
   const formatDate = (dt) => {
@@ -147,24 +106,48 @@ function Settings() {
             </div>
             <h3>Personal Information</h3>
           </div>
-          <div className="settings-field">
-            <div className="settings-field-label">Full Name</div>
-            <div className="settings-field-value">{worker?.fullName || '—'}</div>
+          
+          <div style={{ padding: '0 16px 16px', display: 'flex', justifyContent: 'flex-end' }}>
+            {!isEditingProfile && <button className="btn btn-primary btn-sm" onClick={() => setIsEditingProfile(true)}>Edit Profile</button>}
           </div>
-          <div className="settings-field">
-            <div className="settings-field-label">Email Address</div>
-            <div className="settings-field-value" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Mail size={14} style={{ color: 'var(--text-muted)' }} />
-              {worker?.email || '—'}
-            </div>
-          </div>
-          <div className="settings-field">
-            <div className="settings-field-label">Phone Number</div>
-            <div className="settings-field-value" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Phone size={14} style={{ color: 'var(--text-muted)' }} />
-              {worker?.phone || '—'}
-            </div>
-          </div>
+          {isEditingProfile ? (
+            <form onSubmit={handleProfileSave} style={{ padding: '0 16px 16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Full Name</label>
+                <input type="text" required className="form-input" value={profileForm.fullName} onChange={e => setProfileForm({...profileForm, fullName: e.target.value})} />
+              </div>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Phone Number</label>
+                <input type="text" required className="form-input" value={profileForm.phone} onChange={e => setProfileForm({...profileForm, phone: e.target.value})} />
+              </div>
+              <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                <button type="submit" disabled={profileLoading} className={`btn btn-primary ${profileLoading ? 'btn-loading' : ''}`}>Save</button>
+                <button type="button" className="btn btn-secondary" onClick={() => setIsEditingProfile(false)}>Cancel</button>
+              </div>
+            </form>
+          ) : (
+            <>
+              <div className="settings-field">
+                <div className="settings-field-label">Full Name</div>
+                <div className="settings-field-value">{worker?.fullName || '—'}</div>
+              </div>
+              <div className="settings-field">
+                <div className="settings-field-label">Email Address</div>
+                <div className="settings-field-value" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Mail size={14} style={{ color: 'var(--text-muted)' }} />
+                  {worker?.email || '—'}
+                </div>
+              </div>
+              <div className="settings-field">
+                <div className="settings-field-label">Phone Number</div>
+                <div className="settings-field-value" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Phone size={14} style={{ color: 'var(--text-muted)' }} />
+                  {worker?.phone || '—'}
+                </div>
+              </div>
+            </>
+          )}
+
         </div>
 
         {/* Change Password Section */}
@@ -370,10 +353,8 @@ function Settings() {
           {[
             { key: 'emailAlerts', label: 'Email Alerts', desc: 'Receive email notifications for important updates' },
             { key: 'pushNotifications', label: 'Push Notifications', desc: 'Browser push notifications for real-time alerts' },
-            { key: 'smsAlerts', label: 'SMS Alerts', desc: 'Get text messages for critical events' },
             { key: 'claimUpdates', label: 'Claim Updates', desc: 'Notifications when claim status changes' },
             { key: 'weatherAlerts', label: 'Weather Alerts', desc: 'Alerts for severe weather in your area' },
-            { key: 'weeklyDigest', label: 'Weekly Digest', desc: 'Weekly summary of your activity and payouts' },
             { key: 'notificationSound', label: 'Notification Sound', desc: 'Play sound when notifications arrive', icon: notifPrefs.notificationSound ? <Volume2 size={14} /> : <VolumeX size={14} /> },
           ].map(item => (
             <div key={item.key} className="settings-field" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

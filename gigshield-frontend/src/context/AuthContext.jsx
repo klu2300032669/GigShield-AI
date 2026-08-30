@@ -50,11 +50,17 @@ export function AuthProvider({ children }) {
   }, []);
 
   const isAuthenticated = !!worker && !!tokens?.accessToken;
+  
+  const updateWorkerProfile = useCallback((updatedWorker) => {
+    setWorker(updatedWorker);
+    localStorage.setItem('gigshield_worker', JSON.stringify(updatedWorker));
+  }, []);
+
   const isAdmin = worker?.role === 'ADMIN';
 
   return (
     <AuthContext.Provider value={{
-      worker, tokens, login, logout, updateTokens,
+      worker, tokens, login, logout, updateTokens, updateWorkerProfile,
       isAuthenticated, isAdmin
     }}>
       {children}
