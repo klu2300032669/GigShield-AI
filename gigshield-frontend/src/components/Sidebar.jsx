@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useLocation } from '../context/LocationContext.jsx';
 import { notificationApi } from '../api/api.js';
 import CitySelector from './CitySelector.jsx';
 import ThemeToggle from './ThemeToggle.jsx';
@@ -14,6 +15,7 @@ import {
 
 function Sidebar() {
   const { worker, logout, isAdmin } = useAuth();
+  const { city } = useLocation();
   const { t } = useTranslation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -136,7 +138,7 @@ function Sidebar() {
                 {isAdmin ? '★ Admin' : 'Worker'}
               </span>
               <div className="sidebar-user-city">
-                <MapPin size={10} />{worker?.city}
+                <MapPin size={10} />{city || worker?.city}
               </div>
             </div>
           </div>

@@ -308,7 +308,7 @@ function Settings() {
             <div className="settings-field-label">City</div>
             <div className="settings-field-value" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <MapPin size={14} style={{ color: 'var(--text-muted)' }} />
-              {worker?.city || city || '—'}
+              {city || worker?.city || '—'}
             </div>
           </div>
           <div className="settings-field">

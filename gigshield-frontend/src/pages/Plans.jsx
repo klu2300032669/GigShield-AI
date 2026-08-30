@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useLocation } from '../context/LocationContext.jsx';
 import { policyApi } from '../api/api.js';
 import LoadingSpinner from '../components/LoadingSpinner.jsx';
 import {
@@ -10,6 +11,7 @@ import PaymentModal from '../components/PaymentModal.jsx';
 
 function Plans() {
   const { worker } = useAuth();
+  const { city } = useLocation();
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -36,7 +38,7 @@ function Plans() {
         // Adjust premium based on worker's live AI risk score
         const { aiApi } = await import('../api/api.js');
         const riskRes = await aiApi.predictRisk({
-          city: worker?.city || 'Mumbai',
+          city: city || worker?.city || 'Mumbai',
           age: 30, // Mock for demo
           vehicle_type: 'Bike',
           historical_claims: 0
