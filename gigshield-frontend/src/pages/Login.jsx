@@ -67,7 +67,7 @@ function Login() {
           </div>
           <p className="auth-hero-tagline">
             AI-powered parametric insurance that protects gig workers from
-            environmental disruptions â€” automatically.
+            environmental disruptions — automatically.
           </p>
           <div className="auth-hero-features">
             <div className="auth-hero-feature">
@@ -94,7 +94,7 @@ function Login() {
               </div>
               <div className="auth-hero-feature-text">
                 <h4>Parametric Coverage</h4>
-                <p>No manual filing â€” events trigger payouts automatically</p>
+                <p>No manual filing — events trigger payouts automatically</p>
               </div>
             </div>
           </div>

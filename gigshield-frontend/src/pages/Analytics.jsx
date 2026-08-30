@@ -172,8 +172,8 @@ function Analytics() {
   const filteredPayouts = filterByDateRange(payouts);
 
   const formatCurrency = (val) => {
-    if (!val) return 'â‚¹0';
-    return 'â‚¹' + Number(val).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+    if (!val) return '₹0';
+    return '₹' + Number(val).toLocaleString('en-IN', { maximumFractionDigits: 0 });
   };
 
   // Export charts as PNG
@@ -418,7 +418,7 @@ function Analytics() {
           <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
             <strong style={{ color: Number(periodChange) >= 0 ? 'var(--accent-amber)' : 'var(--accent-emerald)' }}>
               {Number(periodChange) >= 0 ? '+' : ''}{periodChange}%
-            </strong> claims vs previous {DATE_RANGES.find(r => r.key === dateRange)?.label?.toLowerCase()} ({prevPeriodCount} â†’ {totalClaims})
+            </strong> claims vs previous {DATE_RANGES.find(r => r.key === dateRange)?.label?.toLowerCase()} ({prevPeriodCount} → {totalClaims})
           </span>
         </div>
       )}
@@ -484,11 +484,11 @@ function Analytics() {
             {[...filteredPayouts.slice(0, 8), ...filteredPayouts.slice(0, 8)].map((p, i) => (
               <div key={i} className="ticker-item">
                 <span className="ticker-hash">0x{Math.random().toString(16).substring(2, 10).toUpperCase()}</span>
-                <span>â€¢</span>
+                <span>•</span>
                 <span>{p.claim?.policy?.worker?.city || 'India'}</span>
-                <span>â€¢</span>
+                <span>•</span>
                 <span className="ticker-amt">{formatCurrency(p.amount)}</span>
-                <span>â€¢</span>
+                <span>•</span>
                 <span style={{ color: p.status === 'COMPLETED' ? '#10b981' : '#f59e0b' }}>{p.status}</span>
               </div>
             ))}
@@ -537,7 +537,7 @@ function Analytics() {
           </div>
         </div>
 
-        {/* Risk Distribution â€” donut chart */}
+        {/* Risk Distribution — donut chart */}
         <div className="analytics-card">
           <h3><BarChart3 size={18} style={{ color: 'var(--accent-emerald)' }} /> Risk Score Distribution</h3>
           {riskSegments.length > 0 ? (

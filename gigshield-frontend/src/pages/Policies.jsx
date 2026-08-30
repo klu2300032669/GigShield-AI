@@ -75,7 +75,7 @@ ${conditions}
               </div>
             </div>
           </div>
-          <button className="btn btn-ghost" onClick={onClose} style={{ padding: '8px' }}>âœ•</button>
+          <button className="btn btn-ghost" onClick={onClose} style={{ padding: '8px' }}>✕</button>
         </div>
 
         {/* Status bar */}
@@ -180,8 +180,8 @@ function Policies() {
   }, [showSuccess, showError]);
 
   const formatCurrency = (val) => {
-    if (!val) return 'â‚¹0';
-    return 'â‚¹' + Number(val).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+    if (!val) return '₹0';
+    return '₹' + Number(val).toLocaleString('en-IN', { maximumFractionDigits: 0 });
   };
 
   const getCoverageIcon = (type) => {
@@ -263,7 +263,7 @@ function Policies() {
                     fontSize: '0.78rem', color: 'var(--accent-amber)', marginBottom: 12
                   }}>
                     <Calendar size={13} aria-hidden="true" />
-                    Expires in {daysLeft} day{daysLeft !== 1 ? 's' : ''} â€” renew soon!
+                    Expires in {daysLeft} day{daysLeft !== 1 ? 's' : ''} — renew soon!
                   </div>
                 )}
 
@@ -290,7 +290,7 @@ function Policies() {
                   <div className="policy-detail-item">
                     <div className="policy-detail-label">Period</div>
                     <div className="policy-detail-value" style={{ fontSize: '0.82rem' }}>
-                      {policy.startDate} â€” {policy.endDate}
+                      {policy.startDate} — {policy.endDate}
                     </div>
                   </div>
                 </div>
@@ -357,7 +357,7 @@ function Policies() {
         onClose={() => setViewingContract(null)} 
       />
 
-      {/* Accessible Confirm Dialog â€” replaces window.confirm */}
+      {/* Accessible Confirm Dialog — replaces window.confirm */}
       <ConfirmDialog
         isOpen={confirmOpen}
         onConfirm={handleCancel}

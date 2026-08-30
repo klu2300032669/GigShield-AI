@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { eventApi } from '../api/api.js';
 import { useLocation } from '../context/LocationContext.jsx';
 import { TableSkeleton } from '../components/ui/SkeletonLoader.jsx';
@@ -96,11 +96,11 @@ function ForecastChart({ city, coordinates }) {
   const codes = forecast.weathercode?.slice(0, 7) || [];
 
   const getWeatherEmoji = (code) => {
-    if (code <= 3) return 'â˜€ï¸';
-    if (code <= 48) return 'â˜ï¸';
-    if (code <= 67) return 'ðŸŒ§ï¸';
-    if (code <= 77) return 'â„ï¸';
-    return 'â›ˆï¸';
+    if (code <= 3) return '☀️';
+    if (code <= 48) return '☁️';
+    if (code <= 67) return '🌧️';
+    if (code <= 77) return '❄️';
+    return '⛈️';
   };
 
   const getDayLabel = (dateStr) => {
@@ -117,7 +117,7 @@ function ForecastChart({ city, coordinates }) {
     <div className="forecast-chart glass-card" style={{ overflow: 'hidden' }}>
       <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 'var(--space-md)', fontSize: '1rem' }}>
         <TrendingUp size={16} style={{ color: 'var(--accent-sky)' }} />
-        7-Day Forecast â€” {city}
+        7-Day Forecast — {city}
       </h3>
       <div style={{ display: 'flex', gap: 0, overflowX: 'auto' }}>
         {days.map((day, i) => {
@@ -210,7 +210,7 @@ function WeatherMonitor() {
   const safeEvents = Array.isArray(events) ? events : [];
   const displayCity = viewCity || city;
 
-  // Sort events â€” selected city first, then others
+  // Sort events — selected city first, then others
   const sortedEvents = [...safeEvents].sort((a, b) => {
     const aMatch = a.city?.toLowerCase() === displayCity.toLowerCase() ? 0 : 1;
     const bMatch = b.city?.toLowerCase() === displayCity.toLowerCase() ? 0 : 1;
@@ -305,7 +305,7 @@ function WeatherMonitor() {
           <AlertTriangle size={22} style={{ color: '#ef4444', flexShrink: 0, animation: 'pulse 2s infinite' }} />
           <div>
             <div style={{ fontWeight: 700, color: '#ef4444', fontSize: '0.95rem', marginBottom: 2 }}>
-              âš ï¸ Severe Weather Alert â€” {city}
+              ⚠️ Severe Weather Alert — {city}
             </div>
             <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
               {severeAlerts.length} severe event{severeAlerts.length > 1 ? 's' : ''} detected:
@@ -335,7 +335,7 @@ function WeatherMonitor() {
                   <div>
                     <div className="weather-city">{event.city}</div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                      {event.eventType?.replace('_', ' ')} â€¢ {formatTime(event.eventTimestamp)}
+                      {event.eventType?.replace('_', ' ')} • {formatTime(event.eventTimestamp)}
                     </div>
                   </div>
                 </div>
