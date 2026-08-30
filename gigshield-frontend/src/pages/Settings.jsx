@@ -80,6 +80,32 @@ function Settings() {
     });
   };
 
+  const [requestingPush, setRequestingPush] = useState(false);
+
+  const handleRequestPushPermission = async () => {
+    if (!('Notification' in window)) {
+      showError('Not Supported', 'Your browser does not support push notifications.');
+      return;
+    }
+    setRequestingPush(true);
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        setNotifPrefs(prev => ({ ...prev, pushNotifications: true }));
+        new Notification('GigShield AI', {
+          body: 'Push notifications enabled! You will receive real-time alerts.',
+        });
+        showSuccess('Enabled', 'Push notifications enabled successfully.');
+      } else {
+        showError('Denied', 'Push notification permission was denied.');
+      }
+    } catch (err) {
+      showError('Error', 'Failed to request notification permissions.');
+    } finally {
+      setRequestingPush(false);
+    }
+  };
+
   const formatDate = (dt) => {
     if (!dt) return '—';
     try {
