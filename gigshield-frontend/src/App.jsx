@@ -81,7 +81,6 @@ function AppLayout({ children, fallback }) {
       </main>
       <MobileNav />
       <BackToTop />
-      <AIChatBot />
     </div>
   );
 }
@@ -177,6 +176,7 @@ function App() {
           <Suspense fallback={<AuthFallback />}><NotFound /></Suspense>
         } />
       </Routes>
+      <AIChatBot />
     </>
   );
 }

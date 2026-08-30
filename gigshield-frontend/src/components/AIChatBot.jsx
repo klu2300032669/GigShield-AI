@@ -46,8 +46,6 @@ function AIChatBot() {
     }
   };
 
-  if (!user) return null;
-
   return (
     <>
       {/* Floating Button */}
