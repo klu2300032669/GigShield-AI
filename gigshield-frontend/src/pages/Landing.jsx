@@ -1,4 +1,4 @@
-import React from 'react';
+ï»¿import React from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { Shield, Zap, CloudLightning, ArrowRight, BrainCircuit, Activity } from 'lucide-react';
@@ -41,7 +41,7 @@ function Landing() {
             Parametric Insurance for the <span className="gradient-text">Gig Economy.</span>
           </h1>
           <p style={{ fontSize: '1.25rem', color: 'var(--text-secondary)', marginBottom: '40px', lineHeight: 1.6, maxWidth: '600px', margin: '0 auto 40px' }}>
-            Instant, automated payouts for Swiggy, Zomato, and Zepto workers when severe weather strikes. No paperwork, no waiting—just autonomous protection.
+            Instant, automated payouts for Swiggy, Zomato, and Zepto workers when severe weather strikes. No paperwork, no waitingâ€”just autonomous protection.
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
             <Link to="/register" className="btn btn-primary" style={{ padding: '16px 32px', fontSize: '1.1rem', borderRadius: '30px' }}>
@@ -64,7 +64,7 @@ function Landing() {
                 <CloudLightning size={28} />
               </div>
               <h3 style={{ fontSize: '1.3rem', marginBottom: '12px' }}>Live Oracle Tracking</h3>
-              <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}>Our nodes constantly monitor Open-Meteo APIs. If rainfall exceeds 30mm or heat crosses 42°C in your zone, the system alerts immediately.</p>
+              <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}>Our nodes constantly monitor Open-Meteo APIs. If rainfall exceeds 30mm or heat crosses 42Â°C in your zone, the system alerts immediately.</p>
             </div>
 
             <div className="glass-card" style={{ padding: '32px', background: '#0f172a' }}>
@@ -91,11 +91,10 @@ function Landing() {
           <Shield size={20} />
           <span style={{ fontWeight: 600, color: '#fff' }}>GigShield AI</span>
         </div>
-        <p>© {new Date().getFullYear()} GigShield Project. Built for the Gig Economy.</p>
+        <p>Â© 2026 GigShield Project. Built for the Gig Economy.</p>
       </footer>
     </div>
   );
 }
 
 export default Landing;
-
