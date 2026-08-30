@@ -13,6 +13,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import com.gigshield.repository.PolicyRepository;
+import com.gigshield.service.ClaimService;
+
 /**
  * Automated weather monitoring service that fetches live weather data
  * from the Open-Meteo API (100% free, no API key needed) every hour.
@@ -26,6 +29,8 @@ public class WeatherFetchService {
 
     private final EnvironmentalEventRepository eventRepository;
     private final RestTemplate restTemplate;
+    private final PolicyRepository policyRepository;
+    private final ClaimService claimService;
 
     // Major Indian cities with their coordinates
     private static final List<CityCoord> MONITORED_CITIES = List.of(
@@ -83,25 +88,53 @@ public class WeatherFetchService {
         // Check for Heavy Rain (>30mm precipitation)
         if (precip > 30 || rain > 30) {
             EnvironmentalEvent.Severity severity = precip > 80 ? EnvironmentalEvent.Severity.CRITICAL : EnvironmentalEvent.Severity.HIGH;
-            createEvent(city.name(), EnvironmentalEvent.EventType.HEAVY_RAIN, severity,
+            EnvironmentalEvent savedEvent = createEvent(city.name(), EnvironmentalEvent.EventType.HEAVY_RAIN, severity,
                     BigDecimal.valueOf(precip), BigDecimal.valueOf(temp), null);
             eventsCreated++;
             log.info("🌧️ Heavy rain detected in {} ({}mm)", city.name(), precip);
+            triggerParametricClaims(savedEvent, city.name(), com.gigshield.model.InsurancePlan.CoverageType.RAIN);
         }
 
         // Check for Extreme Heat (>42°C)
         if (temp > 42) {
             EnvironmentalEvent.Severity severity = temp > 46 ? EnvironmentalEvent.Severity.CRITICAL : EnvironmentalEvent.Severity.HIGH;
-            createEvent(city.name(), EnvironmentalEvent.EventType.EXTREME_HEAT, severity,
+            EnvironmentalEvent savedEvent = createEvent(city.name(), EnvironmentalEvent.EventType.EXTREME_HEAT, severity,
                     BigDecimal.ZERO, BigDecimal.valueOf(temp), null);
             eventsCreated++;
             log.info("🔥 Extreme heat detected in {} ({}°C)", city.name(), temp);
+            triggerParametricClaims(savedEvent, city.name(), com.gigshield.model.InsurancePlan.CoverageType.HEAT);
         }
 
         return eventsCreated;
     }
 
-    private void createEvent(String city, EnvironmentalEvent.EventType type,
+    private void triggerParametricClaims(EnvironmentalEvent event, String city, com.gigshield.model.InsurancePlan.CoverageType targetCoverage) {
+        if (policyRepository == null || claimService == null) return;
+        List<com.gigshield.model.Policy> activePolicies = policyRepository.findByStatus(com.gigshield.model.Policy.PolicyStatus.ACTIVE);
+        int triggered = 0;
+        for (com.gigshield.model.Policy policy : activePolicies) {
+            // Check if worker is in the affected city
+            if (policy.getWorker() != null && city.equalsIgnoreCase(policy.getWorker().getCity())) {
+                com.gigshield.model.InsurancePlan.CoverageType planCoverage = policy.getPlan().getCoverageType();
+                if (planCoverage == targetCoverage || planCoverage == com.gigshield.model.InsurancePlan.CoverageType.ALL) {
+                    try {
+                        // Estimated loss based on severity (CRITICAL = 100%, HIGH = 50% max payout)
+                        BigDecimal lossFactor = event.getSeverity() == EnvironmentalEvent.Severity.CRITICAL ? BigDecimal.ONE : new BigDecimal("0.5");
+                        BigDecimal estimatedLoss = policy.getPlan().getMaxPayout().multiply(lossFactor);
+                        
+                        // Execute AI smart contract via ClaimService
+                        claimService.triggerClaim(policy.getId(), event.getId(), estimatedLoss, 4.0, 5);
+                        triggered++;
+                    } catch (Exception e) {
+                        log.error("Failed to auto-trigger claim for policy {}: {}", policy.getId(), e.getMessage());
+                    }
+                }
+            }
+        }
+        log.info("🤖 Auto-Adjudication Complete: {} claims triggered for {} event in {}", triggered, event.getEventType(), city);
+    }
+
+    private EnvironmentalEvent createEvent(String city, EnvironmentalEvent.EventType type,
                              EnvironmentalEvent.Severity severity,
                              BigDecimal rainfall, BigDecimal temperature, Integer aqi) {
         EnvironmentalEvent event = EnvironmentalEvent.builder()
@@ -115,7 +148,7 @@ public class WeatherFetchService {
                 .sourceApi("Open-Meteo")
                 .build();
 
-        eventRepository.save(event);
+        return eventRepository.save(event);
     }
 
     private double toDouble(Object value) {
