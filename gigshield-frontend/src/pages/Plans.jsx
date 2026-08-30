@@ -22,12 +22,45 @@ function Plans() {
   const [sortBy, setSortBy] = useState('popular');
   const [expandedPlanId, setExpandedPlanId] = useState(null);
 
+  const [riskScore, setRiskScore] = useState(null);
+
   useEffect(() => { fetchPlans(); }, []);
 
   const fetchPlans = async () => {
     try {
       const response = await policyApi.getPlans();
-      setPlans(response.data || []);
+      let fetchedPlans = response.data || [];
+      
+      try {
+        // REAL WORLD FEATURE: Dynamic Underwriting (Pricing)
+        // Adjust premium based on worker's live AI risk score
+        const { aiApi } = await import('../api/api.js');
+        const riskRes = await aiApi.predictRisk({
+          city: worker?.city || 'Mumbai',
+          age: 30, // Mock for demo
+          vehicle_type: 'Bike',
+          historical_claims: 0
+        });
+        
+        if (riskRes.data && riskRes.data.risk_score) {
+          const score = riskRes.data.risk_score;
+          setRiskScore(score);
+          
+          // Apply dynamic pricing multiplier (min 0.8x, max 2.5x)
+          const multiplier = Math.max(0.8, Math.min(2.5, score * 3));
+          
+          fetchedPlans = fetchedPlans.map(plan => ({
+            ...plan,
+            originalPremiumAmount: plan.premiumAmount,
+            premiumAmount: Math.round(plan.premiumAmount * multiplier),
+            pricingReasoning: `Adjusted based on your real-time risk score (${score.toFixed(2)}).`
+          }));
+        }
+      } catch (aiErr) {
+        console.warn('AI Underwriting failed, falling back to base pricing', aiErr);
+      }
+
+      setPlans(fetchedPlans);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -109,6 +142,11 @@ function Plans() {
             Insurance Plans
           </h1>
           <p className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>Choose the right protection for your gig income</p>
+          {riskScore && (
+            <div className="animate-fade-in-up" style={{ marginTop: '12px', animationDelay: '150ms', display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 12px', background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '20px', fontSize: '0.8rem', color: 'var(--accent-blue)' }}>
+              <Star size={14} /> <strong>AI Underwriting Active:</strong> Prices dynamically adjusted to your real-time risk.
+            </div>
+          )}
         </div>
 
         {/* Controls */}

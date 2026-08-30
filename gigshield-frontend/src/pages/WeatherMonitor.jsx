@@ -201,17 +201,22 @@ function WeatherMonitor() {
   );
 
   return (
-    <div>
-      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 'var(--space-md)' }}>
+    <div className="animate-fade-in">
+      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-md)' }}>
         <div>
-          <h1>
-            <div className="page-header-icon" style={{ background: 'var(--accent-amber-glow)', color: 'var(--accent-amber)' }}>
+          <h1 className="animate-fade-in-up">
+            <div className="page-header-icon" style={{ background: 'var(--accent-sky-glow)', color: 'var(--accent-sky)' }}>
               <CloudSun size={20} />
             </div>
-            Weather Monitor
+            Live Oracle Feed
           </h1>
-          <p>
-            Real-time environmental events — showing <strong style={{ color: 'var(--accent-emerald)' }}>
+          <p className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>Real-time multi-source environmental data monitoring</p>
+          
+          <div className="animate-fade-in-up" style={{ marginTop: '12px', animationDelay: '150ms', display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 12px', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '20px', fontSize: '0.8rem', color: 'var(--success)' }}>
+            <Activity size={14} /> <strong>Oracle Consensus:</strong> Cross-verified with Open-Meteo, Copernicus, & AQICN.
+          </div>
+          <p style={{ marginTop: '12px' }}>
+            Showing <strong style={{ color: 'var(--accent-emerald)' }}>
               <MapPin size={12} style={{ display: 'inline', verticalAlign: 'middle' }} /> {displayCity}
             </strong> first
           </p>

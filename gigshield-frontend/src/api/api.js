@@ -150,6 +150,7 @@ export const aiApi = {
   getModelInfo: () => axios.get(`${AI_BASE}/models`),
   getMetrics: () => axios.get(`${AI_BASE}/metrics/historical`),
   analyzeFraud: (data) => axios.post(`${AI_BASE}/detect-fraud`, data),
+  predictRisk: (data) => axios.post(`${AI_BASE}/predict`, data),
 };
 
 // ---- Payment APIs ----
