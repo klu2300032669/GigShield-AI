@@ -99,8 +99,8 @@ function AIChatBot() {
         <div style={{
           position: 'fixed', bottom: '80px', right: '20px', zIndex: 9999,
           width: 'min(380px, calc(100vw - 40px))', height: 'min(520px, calc(100vh - 140px))',
-          background: 'rgba(15, 15, 18, 0.95)', backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px',
+          background: 'var(--bg-sidebar)', backdropFilter: 'blur(20px)',
+          border: '1px solid var(--border-color)', borderRadius: '20px',
           display: 'flex', flexDirection: 'column', overflow: 'hidden',
           boxShadow: '0 24px 48px rgba(0,0,0,0.5)',
           animation: 'fadeInUp 0.3s ease-out',
@@ -108,7 +108,7 @@ function AIChatBot() {
           {/* Header */}
           <div style={{
             padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '12px',
-            borderBottom: '1px solid rgba(255,255,255,0.08)',
+            borderBottom: '1px solid var(--border-color)',
             background: 'linear-gradient(135deg, rgba(16,185,129,0.1), rgba(20,184,166,0.05))',
           }}>
             <div style={{
@@ -119,11 +119,11 @@ function AIChatBot() {
               <Bot size={20} color="white" />
             </div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'white' }}>GigShield AI</div>
+              <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)' }}>GigShield AI</div>
               <div style={{ fontSize: '0.75rem', color: '#10b981' }}>● Online — Powered by ML</div>
             </div>
             <button onClick={() => setIsOpen(false)} style={{
-              background: 'rgba(255,255,255,0.05)', border: 'none', borderRadius: '8px',
+              background: 'var(--bg-secondary)', border: 'none', borderRadius: '8px',
               padding: '6px', cursor: 'pointer', color: 'var(--text-muted)',
             }}>
               <X size={18} />
@@ -147,7 +147,7 @@ function AIChatBot() {
                 </div>
                 <div style={{
                   maxWidth: '75%', padding: '10px 14px', borderRadius: '16px',
-                  background: msg.role === 'ai' ? 'rgba(255,255,255,0.06)' : 'rgba(16,185,129,0.15)',
+                  background: msg.role === 'ai' ? 'var(--bg-secondary)' : 'var(--accent-emerald-glow)',
                   border: `1px solid ${msg.role === 'ai' ? 'rgba(255,255,255,0.06)' : 'rgba(16,185,129,0.2)'}`,
                   fontSize: '0.88rem', lineHeight: 1.5, color: '#e2e8f0',
                   whiteSpace: 'pre-wrap',
@@ -199,8 +199,8 @@ function AIChatBot() {
               placeholder="Ask about insurance, claims, risks..."
               style={{
                 flex: 1, padding: '10px 14px', borderRadius: '12px',
-                background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
-                color: 'white', fontSize: '0.88rem', outline: 'none',
+                background: 'var(--bg-secondary)', border: '1px solid var(--border-color)',
+                color: 'var(--text-primary)', fontSize: '0.88rem', outline: 'none',
               }}
             />
             <button
@@ -220,7 +220,7 @@ function AIChatBot() {
             <button type="submit" disabled={loading || !input.trim()} style={{
               padding: '10px', borderRadius: '12px',
               background: input.trim() ? 'linear-gradient(135deg, #10b981, #14b8a6)' : 'rgba(255,255,255,0.05)',
-              border: 'none', cursor: input.trim() ? 'pointer' : 'default', color: 'white',
+              border: 'none', cursor: input.trim() ? 'pointer' : 'default', color: 'var(--text-primary)',
             }}>
               <Send size={18} />
             </button>

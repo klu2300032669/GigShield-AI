@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useLocation } from '../context/LocationContext.jsx';
+import { workerApi } from '../api/api.js';
+import { useToast } from '../context/ToastContext.jsx';
 import {
   Settings as SettingsIcon, User, Mail, Phone, MapPin,
   Briefcase, Calendar, Shield, Activity, Bell, BellOff, Lock,
@@ -26,6 +28,31 @@ function Settings() {
   });
 
   const [requestingPush, setRequestingPush] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({ current: '', new: '', confirm: '' });
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const { showSuccess, showError } = useToast();
+
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    if (passwordForm.new !== passwordForm.confirm) {
+      showError('Validation Error', 'New passwords do not match');
+      return;
+    }
+    setPasswordLoading(true);
+    try {
+      await workerApi.changePassword(worker.id, {
+        currentPassword: passwordForm.current,
+        newPassword: passwordForm.new
+      });
+      showSuccess('Success', 'Your password has been updated securely.');
+      setPasswordForm({ current: '', new: '', confirm: '' });
+    } catch (err) {
+      showError('Error', err.response?.data?.message || 'Failed to update password');
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
+
 
   const togglePref = (key) => {
     setNotifPrefs(prev => ({ ...prev, [key]: !prev[key] }));
@@ -148,21 +175,20 @@ function Settings() {
             </div>
             <h3>Change Password</h3>
           </div>
-          <div className="settings-field" style={{ display: 'block' }}>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '1rem' }}>
-              Keep your account secure by using a strong password. You can reset your password using your current password or via email OTP if you forgot it.
-            </p>
-            <button 
-              className="btn btn-primary" 
-              style={{ padding: '0.5rem 1rem', fontSize: '0.9rem' }}
-              onClick={() => {
-                // For simplicity, just redirect them to Forgot Password since we fixed OTP bypass!
-                window.location.href = '/forgot-password';
-              }}
-            >
-              Change Password
+          <form onSubmit={handlePasswordChange} className="settings-field" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <input type="password" required className="form-input" placeholder="Current Password" value={passwordForm.current} onChange={e => setPasswordForm({...passwordForm, current: e.target.value})} />
+            </div>
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <input type="password" required className="form-input" placeholder="New Password" value={passwordForm.new} onChange={e => setPasswordForm({...passwordForm, new: e.target.value})} />
+            </div>
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <input type="password" required className="form-input" placeholder="Confirm New Password" value={passwordForm.confirm} onChange={e => setPasswordForm({...passwordForm, confirm: e.target.value})} />
+            </div>
+            <button type="submit" disabled={passwordLoading} className={`btn btn-primary ${passwordLoading ? 'btn-loading' : ''}`} style={{ alignSelf: 'flex-start', marginTop: '4px' }}>
+              {!passwordLoading && 'Update Password'}
             </button>
-          </div>
+          </form>
         </div>
 
         {/* Location Management Section */}

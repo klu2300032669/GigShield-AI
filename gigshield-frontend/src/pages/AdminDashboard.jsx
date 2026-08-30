@@ -198,7 +198,7 @@ function AdminDashboard() {
             style={{ background: 'var(--danger)', borderColor: 'var(--danger)', boxShadow: '0 0 15px rgba(239, 68, 68, 0.4)' }}
             onClick={async () => {
               try {
-                const targetCity = window.prompt("⚠️ AI DISASTER SIMULATION ⚠️\n\nEnter the city to simulate a massive flood event in (e.g., Mumbai, Delhi, Bangalore):", "Mumbai");
+                const targetCity = window.prompt("🚨 AI DISASTER SIMULATION 🚨\\n\\nEnter the city to simulate a massive flood event in (e.g., Mumbai, Delhi, Bangalore):", "Mumbai");
                 if (!targetCity) return; // User cancelled
                 
                 if (!window.confirm(`DANGER: This will generate a simulated 150mm flood in ${targetCity} and force the backend Cron Job to trigger Python AI Auto-Adjudication. Proceed?`)) return;
@@ -301,7 +301,7 @@ function AdminDashboard() {
             <div>
               <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Treasury Solvency Status</div>
               <div style={{ fontSize: '0.9rem', fontWeight: 600, padding: '4px 8px', borderRadius: '12px', display: 'inline-block', background: (stats.totalRevenue + 500000) > (stats.activePolicies * 5000) ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)', color: (stats.totalRevenue + 500000) > (stats.activePolicies * 5000) ? 'var(--accent-emerald)' : 'var(--accent-amber)' }}>
-                {(stats.totalRevenue + 500000) > (stats.activePolicies * 5000) ? '🟢 EXCELLENT (Over-collateralized)' : '🟡 WARNING (High Exposure)'}
+                {(stats.totalRevenue + 500000) > (stats.activePolicies * 5000) ? '✅ EXCELLENT (Over-collateralized)' : '⚠️ WARNING (High Exposure)'}
               </div>
             </div>
           </div>
