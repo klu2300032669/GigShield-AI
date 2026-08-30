@@ -247,9 +247,28 @@ function WeatherWidgetMini({ city, coordinates, onWeatherUpdate }) {
   );
 }
 
-function AIRiskExplainerModal({ show, onClose, city }) {
+function AIRiskExplainerModal({ show, onClose, city, aiRiskData }) {
   if (!show) return null;
   
+  // Use real feature importances from Python backend if available, fallback to defaults
+  const features = aiRiskData?.feature_importances || {
+    "rainfall_mm": 0.45,
+    "temperature_c": 0.30,
+    "aqi": 0.15,
+    "delivery_drop_rate": 0.10
+  };
+
+  const score = aiRiskData ? (aiRiskData.risk_score * 10).toFixed(1) : "7.8";
+
+  // Map backend feature names to readable names and colors
+  const featureMeta = {
+    "rainfall_mm": { name: "Real-time Precipitation (API)", color: "var(--accent-sky)" },
+    "temperature_c": { name: "Extreme Temperature", color: "var(--accent-amber)" },
+    "aqi": { name: "Air Quality Index (AQI)", color: "var(--accent-coral)" },
+    "delivery_drop_rate": { name: "Zone Delivery Delay Rate", color: "var(--accent-violet)" },
+    "online_hours": { name: "Worker Fatigue (Hours Online)", color: "var(--accent-teal)" }
+  };
+
   return (
     <div className="modal-overlay" onClick={onClose} style={{
       position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
@@ -271,59 +290,31 @@ function AIRiskExplainerModal({ show, onClose, city }) {
         </div>
         
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '24px' }}>
-          Our Machine Learning model calculates your real-time risk score for <strong>{city}</strong> using the following weighted parameters:
+          Our Machine Learning model (<strong>{aiRiskData?.model_version || 'XGBoost v2.1'}</strong>) calculates your real-time risk score for <strong>{city}</strong> using the following weighted parameters:
         </p>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
-          {/* Factor 1 */}
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '4px' }}>
-              <span style={{ color: 'var(--text-primary)' }}>Real-time Precipitation (API)</span>
-              <span style={{ color: 'var(--accent-sky)', fontWeight: 600 }}>45%</span>
-            </div>
-            <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px' }}>
-              <div style={{ width: '45%', height: '100%', background: 'var(--accent-sky)', borderRadius: '4px' }} />
-            </div>
-          </div>
-          
-          {/* Factor 2 */}
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '4px' }}>
-              <span style={{ color: 'var(--text-primary)' }}>Zone Traffic Density</span>
-              <span style={{ color: 'var(--accent-amber)', fontWeight: 600 }}>30%</span>
-            </div>
-            <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px' }}>
-              <div style={{ width: '30%', height: '100%', background: 'var(--accent-amber)', borderRadius: '4px' }} />
-            </div>
-          </div>
-
-          {/* Factor 3 */}
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '4px' }}>
-              <span style={{ color: 'var(--text-primary)' }}>Historical Claims Density</span>
-              <span style={{ color: 'var(--accent-coral)', fontWeight: 600 }}>15%</span>
-            </div>
-            <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px' }}>
-              <div style={{ width: '15%', height: '100%', background: 'var(--accent-coral)', borderRadius: '4px' }} />
-            </div>
-          </div>
-
-          {/* Factor 4 */}
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '4px' }}>
-              <span style={{ color: 'var(--text-primary)' }}>Time of Day Multiplier</span>
-              <span style={{ color: 'var(--accent-violet)', fontWeight: 600 }}>10%</span>
-            </div>
-            <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px' }}>
-              <div style={{ width: '10%', height: '100%', background: 'var(--accent-violet)', borderRadius: '4px' }} />
-            </div>
-          </div>
+          {Object.entries(features).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([key, weight]) => {
+            const meta = featureMeta[key] || { name: key, color: "var(--accent-emerald)" };
+            const pct = (weight * 100).toFixed(0);
+            return (
+              <div key={key}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '4px' }}>
+                  <span style={{ color: 'var(--text-primary)' }}>{meta.name}</span>
+                  <span style={{ color: meta.color, fontWeight: 600 }}>{pct}%</span>
+                </div>
+                <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px' }}>
+                  <div style={{ width: `${pct}%`, height: '100%', background: meta.color, borderRadius: '4px' }} />
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         <div style={{ padding: '16px', background: 'rgba(251, 113, 133, 0.1)', borderRadius: '8px', border: '1px solid rgba(251, 113, 133, 0.2)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontWeight: 600 }}>Final Computed Score:</span>
-            <span style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--accent-coral)' }}>7.8<span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>/10</span></span>
+            <span style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--accent-coral)' }}>{score}<span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>/10</span></span>
           </div>
         </div>
       </div>
@@ -338,6 +329,7 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [liveWeather, setLiveWeather] = useState(null);
   const [showRiskModal, setShowRiskModal] = useState(false);
+  const [aiRiskData, setAiRiskData] = useState(null);
   const [error, setError] = useState('');
   const [paymentToast, setPaymentToast] = useState('');
   const [searchParams, setSearchParams] = useSearchParams();
@@ -379,6 +371,35 @@ function Dashboard() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!city || !worker) return;
+    const getAiRisk = async () => {
+      try {
+        const { aiApi } = await import('../api/api.js');
+        const aiRes = await aiApi.predictRisk({
+          worker_id: worker.id,
+          city: city,
+          environmental_data: {
+            event_type: "NORMAL",
+            rainfall_mm: liveWeather ? (liveWeather.rain || 0.0) : 0.0,
+            temperature_c: liveWeather ? (liveWeather.temp || 28.0) : 28.0,
+            aqi: 60
+          },
+          activity_data: {
+            online_hours: 4.0,
+            expected_deliveries: 15,
+            completed_deliveries: 12,
+            delivery_drop_rate: 10.0
+          }
+        });
+        setAiRiskData(aiRes.data);
+      } catch (err) {
+        console.error("Failed to load AI risk:", err);
+      }
+    };
+    getAiRisk();
+  }, [city, worker, liveWeather]);
 
   if (loading) return <DashboardSkeleton />;
   if (error) return <div className="alert alert-error"><AlertTriangle size={16} /> {error}</div>;
@@ -518,10 +539,12 @@ function Dashboard() {
                   <Brain size={14} /> Explain AI Decision
                 </button>
               </div>
-              <span className="risk-score risk-high" style={{ fontSize: '1.25rem' }}>7.8 / 10</span>
+              <span className={`risk-score ${aiRiskData ? (aiRiskData.risk_score >= 0.7 ? 'risk-high' : aiRiskData.risk_score >= 0.4 ? 'risk-medium' : 'risk-low') : 'risk-medium'}`} style={{ fontSize: '1.25rem' }}>
+                {aiRiskData ? (aiRiskData.risk_score * 10).toFixed(1) : '...'} / 10
+              </span>
             </div>
             <div className="risk-bar" style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.1)' }}>
-              <div className="risk-bar-fill" style={{ width: '78%', background: 'var(--accent-coral)' }} />
+              <div className="risk-bar-fill" style={{ width: `${aiRiskData ? aiRiskData.risk_score * 100 : 0}%`, background: aiRiskData ? (aiRiskData.risk_score >= 0.7 ? 'var(--accent-coral)' : aiRiskData.risk_score >= 0.4 ? 'var(--accent-amber)' : 'var(--accent-emerald)') : 'var(--text-muted)', transition: 'width 1s ease-out' }} />
             </div>
           </div>
         </div>
@@ -724,7 +747,7 @@ function Dashboard() {
       </div>
 
       {/* AI Explainer Modal */}
-      <AIRiskExplainerModal show={showRiskModal} onClose={() => setShowRiskModal(false)} city={city} />
+      <AIRiskExplainerModal show={showRiskModal} onClose={() => setShowRiskModal(false)} city={city} aiRiskData={aiRiskData} />
     </div>
   );
 }
