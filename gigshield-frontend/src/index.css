@@ -12,22 +12,16 @@
   --primary-light: #34d399;
   --secondary: #f59e0b;
   --accent: #fb7185;
-  --success: #10b981;
-  --warning: #f59e0b;
-  --error: #ef4444;
-  --info: #3b82f6;
+  /* Modern Dark Theme Palette */
+  --bg-dark: #07090f;
+  --bg-card: rgba(15, 23, 42, 0.6);
+  --bg-sidebar: rgba(10, 15, 30, 0.7);
+  --bg-hover: rgba(255, 255, 255, 0.05);
   
-  --bg-primary: #09090b;
-  --bg-secondary: #0f0f12;
-  --bg-card: #1a1a1f;
-  --bg-sidebar: rgba(9, 9, 11, 0.92);
-  
-  --text-primary: #ffffff;
-  --text-secondary: #9ca3af;
-  --text-muted: #6b7280;
-
-  /* ---- Complete Color Token Set ---- */
-  /* Emerald / Green */
+  /* Neon Accents */
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
+  --accent-teal: #06b6d4;
   --accent-emerald: #10b981;
   --accent-emerald-glow: rgba(16, 185, 129, 0.15);
   /* Teal / Cyan */
