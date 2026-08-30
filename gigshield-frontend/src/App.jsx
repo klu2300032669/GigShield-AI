@@ -8,6 +8,7 @@ import BackToTop from './components/ui/BackToTop.jsx';
 import { Breadcrumb } from './components/ui/Breadcrumb.jsx';
 import { DashboardSkeleton, TableSkeleton } from './components/ui/SkeletonLoader.jsx';
 import LoadingSpinner from './components/LoadingSpinner.jsx';
+import AIChatBot from './components/AIChatBot.jsx';
 
 // ── Code-split every page with React.lazy ──────────────────────────────────
 const Login          = lazy(() => import('./pages/Login.jsx'));
@@ -80,6 +81,7 @@ function AppLayout({ children, fallback }) {
       </main>
       <MobileNav />
       <BackToTop />
+      <AIChatBot />
     </div>
   );
 }

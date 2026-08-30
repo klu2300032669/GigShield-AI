@@ -180,3 +180,14 @@ class ExplainResponse(BaseModel):
     shap_values: Dict[str, float]
     base_value: float
     explanation_summary: List[str]
+
+# ---- Chat Models ----
+
+class ChatRequest(BaseModel):
+    message: str = Field(..., description="The user's message or question")
+    context: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Context variables like city, risk_score, etc.")
+
+class ChatResponse(BaseModel):
+    response: str
+    suggestions: List[str]
+    category: str

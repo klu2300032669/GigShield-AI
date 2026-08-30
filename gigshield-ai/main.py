@@ -21,7 +21,8 @@ from schemas import (  # type: ignore
     NLPAnalysisRequest, NLPAnalysisResponse,
     ModelInfo, ModelListResponse, RollbackResponse,
     CompareResponse, ExplainRequest, ExplainResponse, DriftDetectionResponse,
-    PremiumPredictionRequest, PremiumPredictionResponse
+    PremiumPredictionRequest, PremiumPredictionResponse,
+    ChatRequest, ChatResponse
 )
 
 # Optional Advanced Libraries - DISABLED FOR RENDER FREE TIER (Memory Limits)
@@ -630,6 +631,54 @@ def _fallback_prediction(request: RiskPredictionRequest) -> RiskPredictionRespon
         success=True, risk_score=round(risk_score, 4), trigger_claim=risk_score >= 0.70, # type: ignore
         confidence_level=confidence, factors=["[Fallback Engine utilized]"], model_version="FALLBACK-1.0",
         feature_importances={}, is_anomaly=False, fallback_used=True
+    )
+
+@app.post("/chat", response_model=ChatResponse)
+async def ai_chat(request: ChatRequest):
+    msg = request.message.lower()
+    ctx = request.context or {}
+    
+    category = "GENERAL"
+    if any(k in msg for k in ["claim", "payout", "reimbursement", "money"]):
+        category = "CLAIM"
+    elif any(k in msg for k in ["risk", "danger", "safe", "score"]):
+        category = "RISK"
+    elif any(k in msg for k in ["plan", "coverage", "policy", "premium"]):
+        category = "PLAN"
+    elif any(k in msg for k in ["rain", "weather", "heat", "pollution", "aqi"]):
+        category = "WEATHER"
+        
+    response_text = "I'm your GigShield AI assistant. "
+    suggestions = []
+    
+    if category == "CLAIM":
+        response_text += "You can file a claim automatically when environmental conditions exceed your plan's thresholds. "
+        suggestions = ["How do I file a claim?", "What are the payout thresholds?"]
+    elif category == "RISK":
+        score = ctx.get("risk_score")
+        if score is not None:
+            response_text += f"I see your current risk score is {score}. "
+            if float(score) > 0.7:
+                response_text += "This is high risk. Please stay safe. "
+        response_text += "We monitor real-time weather and API data to calculate your risk."
+        suggestions = ["How is my risk calculated?", "What should I do if risk is high?"]
+    elif category == "PLAN":
+        response_text += "We offer various plans covering rain, extreme heat, and pollution. "
+        suggestions = ["Show me available plans", "What does my current plan cover?"]
+    elif category == "WEATHER":
+        city = ctx.get("city")
+        if city:
+            response_text += f"We are tracking the weather conditions in {city}. "
+        response_text += "Heavy rain, extreme heat, and high pollution can trigger payouts."
+        suggestions = ["Check current weather", "Are there active alerts?"]
+    else:
+        response_text += "How can I help you with your insurance coverage today?"
+        suggestions = ["Tell me about GigShield", "Check my risk score", "File a claim"]
+        
+    return ChatResponse(
+        response=response_text,
+        suggestions=suggestions,
+        category=category
     )
 
 if __name__ == "__main__":

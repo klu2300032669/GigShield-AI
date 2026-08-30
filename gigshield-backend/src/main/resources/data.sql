@@ -19,13 +19,6 @@ VALUES
 ('Saketh Surubhotla', 'saketh.surubhotla@gmail.com', '-969161597', '9000000000', 'Mumbai', 'GigShield', 'ADMIN', true, CURRENT_TIMESTAMP, true)
 ON CONFLICT (email) DO NOTHING;
 
--- Sample Workers
-INSERT INTO workers (full_name, email, password_hash, phone, city, platform_name, role, email_verified, registration_date, is_active)
-VALUES
-('Rahul Kumar', 'rahul@example.com', '1234567', '9876543210', 'Mumbai', 'Swiggy', 'WORKER', true, CURRENT_TIMESTAMP, true),
-('Priya Singh', 'priya@example.com', '1234567', '9876543211', 'Delhi', 'Zomato', 'WORKER', true, CURRENT_TIMESTAMP, true),
-('Amit Patel', 'amit@example.com', '1234567', '9876543212', 'Bangalore', 'Blinkit', 'WORKER', true, CURRENT_TIMESTAMP, true)
-ON CONFLICT (email) DO NOTHING;
 
 -- Fix NULL version values that cause Hibernate @Version NullPointerException
 UPDATE workers SET version = 0 WHERE version IS NULL;

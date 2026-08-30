@@ -35,15 +35,6 @@ public class AdminDataLoader implements CommandLineRunner {
             adminName = "Saketh Surubhotla";
         }
 
-        // Force reset EVERY worker's password to Password@123 to fix corrupted data.sql seeds
-        String defaultWorkerPasswordHash = passwordEncoder.encode("Password@123");
-        workerRepository.findAll().forEach(worker -> {
-            if (worker.getRole() != Worker.Role.ADMIN) {
-                worker.setPasswordHash(defaultWorkerPasswordHash);
-                workerRepository.save(worker);
-            }
-        });
-        log.info("✅ All standard worker passwords reset to 'Password@123'");
 
         // Check if admin user exists and ensure password is valid
         if (workerRepository.existsByEmail(adminEmail)) {
