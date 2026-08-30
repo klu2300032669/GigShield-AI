@@ -6,7 +6,7 @@ import { useToast } from '../context/ToastContext.jsx';
 import {
   ShieldCheck, Users, ClipboardList, FileText, Banknote,
   AlertCircle, CheckCircle2, XCircle, TrendingUp, Activity,
-  CloudSun, Loader2, Trash2, BrainCircuit, Send, Bell
+  CloudSun, Loader2, Trash2, BrainCircuit, Send, Bell, Mic
 } from 'lucide-react';
 
 function AdminDashboard() {
@@ -166,7 +166,33 @@ function AdminDashboard() {
           </h1>
           <p>Platform-wide management and insights</p>
         </div>
-        <div>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <button 
+            className="btn btn-outline" 
+            style={{ color: 'var(--accent-teal)', borderColor: 'var(--accent-teal)' }}
+            onClick={() => {
+              if (!stats) return showError("Data not loaded yet");
+              const isSpeaking = window.speechSynthesis.speaking;
+              if (isSpeaking) {
+                window.speechSynthesis.cancel();
+                showSuccess("AI Briefing Paused", "Voice playback stopped.");
+                return;
+              }
+              const msg = new SpeechSynthesisUtterance();
+              const text = `Good ${new Date().getHours() < 12 ? 'morning' : 'afternoon'} Admin. GigShield A.I. is online and monitoring. We currently have ${stats.totalWorkers} workers protected under ${stats.activePolicies} active smart contracts. The protocol treasury has collected ${formatCurrency(stats.totalRevenue)} in revenue and distributed ${formatCurrency(stats.totalPayoutAmount)} across ${stats.approvedClaims} automated claims. All systems are operating normally.`;
+              msg.text = text;
+              msg.rate = 1.0;
+              msg.pitch = 1.1;
+              const voices = window.speechSynthesis.getVoices();
+              const femaleVoice = voices.find(v => v.name.includes('Female') || v.name.includes('Google UK English Female') || v.name.includes('Samantha') || v.name.includes('Zira'));
+              if (femaleVoice) msg.voice = femaleVoice;
+              window.speechSynthesis.speak(msg);
+              showSuccess("AI Briefing Active", "Ensure your device volume is turned up.");
+            }}
+          >
+            <Mic size={16} /> AI Voice Briefing
+          </button>
+          
           <button 
             className="btn btn-primary" 
             style={{ background: 'var(--danger)', borderColor: 'var(--danger)', boxShadow: '0 0 15px rgba(239, 68, 68, 0.4)' }}
