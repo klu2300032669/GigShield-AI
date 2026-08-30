@@ -141,6 +141,7 @@ export const adminApi = {
   getEvents: () => api.get('/admin/events'),
   sendNotification: (data) => api.post('/admin/notifications/send', data),
   broadcastNotification: (data) => api.post('/admin/notifications/broadcast', data),
+  simulateEvent: (data) => api.post('/admin/simulate-event', data),
 };
 
 // ---- AI Service APIs (direct) ----

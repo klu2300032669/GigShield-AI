@@ -155,15 +155,36 @@ function AdminDashboard() {
 
   return (
     <div>
-      <div className="page-header">
-        <h1>
-          <div className="page-header-icon" style={{ background: 'var(--accent-amber-glow)', color: 'var(--accent-amber)' }}>
-            <ShieldCheck size={20} aria-hidden="true" />
-          </div>
-          Admin Dashboard
-          <span className="admin-badge-title" aria-label="Admin user">★ Admin</span>
-        </h1>
-        <p>Platform-wide management and insights</p>
+      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
+        <div>
+          <h1>
+            <div className="page-header-icon" style={{ background: 'var(--accent-amber-glow)', color: 'var(--accent-amber)' }}>
+              <ShieldCheck size={20} aria-hidden="true" />
+            </div>
+            Admin Dashboard
+            <span className="admin-badge-title" aria-label="Admin user">★ Admin</span>
+          </h1>
+          <p>Platform-wide management and insights</p>
+        </div>
+        <div>
+          <button 
+            className="btn btn-primary" 
+            style={{ background: 'var(--danger)', borderColor: 'var(--danger)', boxShadow: '0 0 15px rgba(239, 68, 68, 0.4)' }}
+            onClick={async () => {
+              try {
+                if (!window.confirm("⚠️ DANGER: This will instantly generate a simulated 150mm flood in Mumbai and force the backend Cron Job to trigger Python AI Auto-Adjudication. Proceed?")) return;
+                const { adminApi } = await import('../api/api.js');
+                await adminApi.simulateEvent({ city: 'Mumbai', type: 'HEAVY_RAIN' });
+                showSuccess("Disaster Simulated!", "Triggered Mumbai Flood. The AI backend is now auto-adjudicating claims. Refreshing data in 3s...");
+                setTimeout(() => window.location.reload(), 3000);
+              } catch (err) {
+                showError("Simulation Failed", err.message);
+              }
+            }}
+          >
+            <CloudSun size={16} /> Trigger AI Disaster Simulation
+          </button>
+        </div>
       </div>
 
       {error && <div className="alert alert-error" role="alert"><AlertCircle size={16} aria-hidden="true" /> {error}</div>}
