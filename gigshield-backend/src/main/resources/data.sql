@@ -13,11 +13,7 @@ VALUES
 ('GigShield Total Weekly', 'Weekly comprehensive coverage for all environmental disruption types.', 'ALL', 79.00, 800.00, 'WEEKLY', true)
 ON CONFLICT DO NOTHING;
 
--- Admin User (password: admin123)
-INSERT INTO workers (full_name, email, password_hash, phone, city, platform_name, role, email_verified, registration_date, is_active)
-VALUES
-('Saketh Surubhotla', 'saketh.surubhotla@gmail.com', '-969161597', '9000000000', 'Mumbai', 'GigShield', 'ADMIN', true, CURRENT_TIMESTAMP, true)
-ON CONFLICT (email) DO NOTHING;
+
 
 
 -- Fix NULL version values that cause Hibernate @Version NullPointerException

@@ -42,10 +42,9 @@ public class AdminDataLoader implements CommandLineRunner {
             final String finalAdminPassword = adminPassword;
             workerRepository.findByEmail(adminEmail).ifPresent(worker -> {
                 worker.setRole(Worker.Role.ADMIN);
-                // Force reset password hash to fix invalid seeds from data.sql
-                worker.setPasswordHash(passwordEncoder.encode(finalAdminPassword));
+                
                 workerRepository.save(worker);
-                log.info("✅ User {} promoted to ADMIN and password reset.", emailForLog);
+                log.info("✅ User {} promoted to ADMIN.", emailForLog);
             });
             return;
         }
