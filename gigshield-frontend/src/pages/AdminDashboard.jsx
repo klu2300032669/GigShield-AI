@@ -172,10 +172,14 @@ function AdminDashboard() {
             style={{ background: 'var(--danger)', borderColor: 'var(--danger)', boxShadow: '0 0 15px rgba(239, 68, 68, 0.4)' }}
             onClick={async () => {
               try {
-                if (!window.confirm("⚠️ DANGER: This will instantly generate a simulated 150mm flood in Mumbai and force the backend Cron Job to trigger Python AI Auto-Adjudication. Proceed?")) return;
+                const targetCity = window.prompt("⚠️ AI DISASTER SIMULATION ⚠️\n\nEnter the city to simulate a massive flood event in (e.g., Mumbai, Delhi, Bangalore):", "Mumbai");
+                if (!targetCity) return; // User cancelled
+                
+                if (!window.confirm(`DANGER: This will generate a simulated 150mm flood in ${targetCity} and force the backend Cron Job to trigger Python AI Auto-Adjudication. Proceed?`)) return;
+                
                 const { adminApi } = await import('../api/api.js');
-                await adminApi.simulateEvent({ city: 'Mumbai', type: 'HEAVY_RAIN' });
-                showSuccess("Disaster Simulated!", "Triggered Mumbai Flood. The AI backend is now auto-adjudicating claims. Refreshing data in 3s...");
+                await adminApi.simulateEvent({ city: targetCity.trim(), type: 'HEAVY_RAIN' });
+                showSuccess("Disaster Simulated!", `Triggered flood in ${targetCity}. The AI backend is now auto-adjudicating claims. Refreshing data in 3s...`);
                 setTimeout(() => window.location.reload(), 3000);
               } catch (err) {
                 showError("Simulation Failed", err.message);
