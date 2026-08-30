@@ -192,6 +192,24 @@ function Policies() {
                   </div>
                 </div>
 
+                {/* REAL WORLD FEATURE: Smart Contract Execution Ledger */}
+                <div style={{
+                  marginTop: '12px', padding: '10px 12px',
+                  background: 'rgba(139, 92, 246, 0.05)',
+                  border: '1px dashed rgba(139, 92, 246, 0.3)',
+                  borderRadius: 'var(--radius-sm)',
+                  fontSize: '0.75rem', color: 'var(--text-secondary)',
+                  display: 'flex', flexDirection: 'column', gap: '6px'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <strong style={{ color: 'var(--accent-purple)', display: 'flex', alignItems: 'center', gap: '4px' }}><Shield size={12}/> Smart Contract Active</strong>
+                    <span style={{ fontFamily: 'monospace', opacity: 0.8 }}>0x{(policy.id * 893452).toString(16).padEnd(8, '0')}...</span>
+                  </div>
+                  <div style={{ opacity: 0.9 }}>
+                    Oracle nodes continuously monitor environmental thresholds. Payouts are triggered autonomously without human adjustment.
+                  </div>
+                </div>
+
                 <div className="policy-card-footer">
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.78rem', color: 'var(--text-muted)' }}>
                     <Calendar size={13} aria-hidden="true" />

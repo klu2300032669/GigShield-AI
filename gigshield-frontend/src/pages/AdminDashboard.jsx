@@ -227,6 +227,36 @@ function AdminDashboard() {
         </div>
       )}
 
+      {/* REAL WORLD FEATURE: Protocol Treasury & Reinsurance Exposure */}
+      {stats && (
+        <div className="glass-card animate-fade-in-up" style={{ marginTop: '24px', padding: '16px', background: 'rgba(139, 92, 246, 0.05)', border: '1px solid rgba(139, 92, 246, 0.2)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+            <ShieldCheck size={18} style={{ color: 'var(--accent-purple)' }} />
+            <h3 style={{ fontSize: '1rem', color: 'var(--text-primary)' }}>Protocol Treasury & Solvency Ratio</h3>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+            <div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Estimated Max Exposure (Active Policies × ₹5,000)</div>
+              <div style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--accent-coral)' }}>
+                {formatCurrency(stats.activePolicies * 5000)}
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Simulated Liquidity Pool (Premiums + Reinsurance)</div>
+              <div style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--accent-emerald)' }}>
+                {formatCurrency(stats.totalRevenue + 500000)}
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Treasury Solvency Status</div>
+              <div style={{ fontSize: '0.9rem', fontWeight: 600, padding: '4px 8px', borderRadius: '12px', display: 'inline-block', background: (stats.totalRevenue + 500000) > (stats.activePolicies * 5000) ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)', color: (stats.totalRevenue + 500000) > (stats.activePolicies * 5000) ? 'var(--accent-emerald)' : 'var(--accent-amber)' }}>
+                {(stats.totalRevenue + 500000) > (stats.activePolicies * 5000) ? '🟢 EXCELLENT (Over-collateralized)' : '🟡 WARNING (High Exposure)'}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Tab Navigation */}
       <div className="filter-tabs" style={{ marginTop: 'var(--space-xl)' }} role="tablist" aria-label="Admin sections">
         {[
