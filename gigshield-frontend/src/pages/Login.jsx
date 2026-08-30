@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { workerApi } from '../api/api.js';
@@ -48,7 +48,7 @@ function Login() {
 
   return (
     <div className="auth-layout" style={{
-      background: 'radial-gradient(circle at center, #0f172a 0%, #020617 100%)',
+      background: 'radial-gradient(circle at center, var(--bg-card) 0%, var(--bg-primary) 100%)',
       minHeight: '100vh', display: 'flex'
     }}>
       <div className="auth-hero" style={{ position: 'relative', overflow: 'hidden', padding: '3rem', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
@@ -67,7 +67,7 @@ function Login() {
           </div>
           <p className="auth-hero-tagline">
             AI-powered parametric insurance that protects gig workers from
-            environmental disruptions — automatically.
+            environmental disruptions â€” automatically.
           </p>
           <div className="auth-hero-features">
             <div className="auth-hero-feature">
@@ -94,7 +94,7 @@ function Login() {
               </div>
               <div className="auth-hero-feature-text">
                 <h4>Parametric Coverage</h4>
-                <p>No manual filing — events trigger payouts automatically</p>
+                <p>No manual filing â€” events trigger payouts automatically</p>
               </div>
             </div>
           </div>
@@ -186,3 +186,4 @@ function Login() {
 }
 
 export default Login;
+

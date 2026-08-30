@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+﻿import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { policyApi, invoiceApi } from '../api/api.js';
 import { CardSkeleton } from '../components/ui/SkeletonLoader.jsx';
@@ -58,7 +58,7 @@ ${conditions}
       padding: '20px'
     }}>
       <div className="glass-card animate-fade-in-up" onClick={e => e.stopPropagation()} style={{
-        background: '#020617', border: '1px solid var(--accent-purple)',
+        background: 'var(--bg-primary)', border: '1px solid var(--accent-purple)',
         maxWidth: '700px', width: '100%', padding: '0', borderRadius: '12px',
         boxShadow: '0 0 40px rgba(139, 92, 246, 0.15)', overflow: 'hidden'
       }}>
@@ -75,11 +75,11 @@ ${conditions}
               </div>
             </div>
           </div>
-          <button className="btn btn-ghost" onClick={onClose} style={{ padding: '8px' }}>✕</button>
+          <button className="btn btn-ghost" onClick={onClose} style={{ padding: '8px' }}>âœ•</button>
         </div>
 
         {/* Status bar */}
-        <div style={{ display: 'flex', gap: '24px', padding: '16px 24px', background: '#0f172a', borderBottom: '1px solid #1e293b' }}>
+        <div style={{ display: 'flex', gap: '24px', padding: '16px 24px', background: 'var(--bg-card)', borderBottom: '1px solid #1e293b' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.85rem' }}>
             <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--accent-emerald)', boxShadow: '0 0 10px var(--accent-emerald)' }} />
             <span style={{ color: 'var(--text-secondary)' }}>Status:</span>
@@ -93,7 +93,7 @@ ${conditions}
         </div>
 
         {/* Code Block */}
-        <div style={{ padding: '24px', background: '#000', overflowX: 'auto' }}>
+        <div style={{ padding: '24px', background: 'var(--bg-secondary)', overflowX: 'auto' }}>
           <pre style={{ margin: 0, fontFamily: '"Fira Code", monospace', fontSize: '0.85rem', color: '#a5b4fc', lineHeight: 1.6 }}>
             <code>{contractCode}</code>
           </pre>
@@ -180,8 +180,8 @@ function Policies() {
   }, [showSuccess, showError]);
 
   const formatCurrency = (val) => {
-    if (!val) return '₹0';
-    return '₹' + Number(val).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+    if (!val) return 'â‚¹0';
+    return 'â‚¹' + Number(val).toLocaleString('en-IN', { maximumFractionDigits: 0 });
   };
 
   const getCoverageIcon = (type) => {
@@ -263,7 +263,7 @@ function Policies() {
                     fontSize: '0.78rem', color: 'var(--accent-amber)', marginBottom: 12
                   }}>
                     <Calendar size={13} aria-hidden="true" />
-                    Expires in {daysLeft} day{daysLeft !== 1 ? 's' : ''} — renew soon!
+                    Expires in {daysLeft} day{daysLeft !== 1 ? 's' : ''} â€” renew soon!
                   </div>
                 )}
 
@@ -290,7 +290,7 @@ function Policies() {
                   <div className="policy-detail-item">
                     <div className="policy-detail-label">Period</div>
                     <div className="policy-detail-value" style={{ fontSize: '0.82rem' }}>
-                      {policy.startDate} — {policy.endDate}
+                      {policy.startDate} â€” {policy.endDate}
                     </div>
                   </div>
                 </div>
@@ -357,7 +357,7 @@ function Policies() {
         onClose={() => setViewingContract(null)} 
       />
 
-      {/* Accessible Confirm Dialog — replaces window.confirm */}
+      {/* Accessible Confirm Dialog â€” replaces window.confirm */}
       <ConfirmDialog
         isOpen={confirmOpen}
         onConfirm={handleCancel}
@@ -374,3 +374,5 @@ function Policies() {
 }
 
 export default Policies;
+
+

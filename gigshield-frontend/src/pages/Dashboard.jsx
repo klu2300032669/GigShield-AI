@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useLocation } from '../context/LocationContext.jsx';
@@ -78,7 +78,7 @@ function AIHealthWidget() {
     return () => { cancelled = true; };
   }, []);
 
-  const label = status === 'loading' ? 'Verifying AI system…'
+  const label = status === 'loading' ? 'Verifying AI systemâ€¦'
     : status === 'online'  ? 'Smart Protection Active'
     : 'Basic Protection Active';
 
@@ -86,7 +86,7 @@ function AIHealthWidget() {
     <div className="ai-status-widget">
       <div className={`ai-status-dot ${status}`} />
       <Brain size={14} style={{ color: 'var(--accent-teal)', flexShrink: 0 }} />
-      <span className="ai-status-text"><strong>GigShield AI</strong> — {label}</span>
+      <span className="ai-status-text"><strong>GigShield AI</strong> â€” {label}</span>
     </div>
   );
 }
@@ -119,7 +119,7 @@ function LiveTerminalLog({ city }) {
 
   return (
     <div style={{
-      marginTop: '24px', padding: '16px', background: '#020617',
+      marginTop: '24px', padding: '16px', background: 'var(--bg-primary)',
       borderRadius: 'var(--radius-sm)', border: '1px solid #1e293b',
       fontFamily: 'monospace', fontSize: '0.8rem', color: '#10b981',
       boxShadow: 'inset 0 0 10px rgba(0,0,0,0.5)',
@@ -183,7 +183,7 @@ function WeatherWidgetMini({ city, coordinates, onWeatherUpdate }) {
           if (onWeatherUpdate) onWeatherUpdate(w);
         }
       } catch {
-        // Silently fail — widget is optional
+        // Silently fail â€” widget is optional
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -220,7 +220,7 @@ function WeatherWidgetMini({ city, coordinates, onWeatherUpdate }) {
         <Thermometer size={18} style={{ color: 'var(--accent-amber)' }} />
         <div>
           <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-            {weather.temp}°C
+            {weather.temp}Â°C
           </div>
           <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
             {getWeatherLabel(weather.code)}
@@ -277,7 +277,7 @@ function AIRiskExplainerModal({ show, onClose, city, aiRiskData }) {
       padding: '20px'
     }}>
       <div className="glass-card animate-fade-in-up" onClick={e => e.stopPropagation()} style={{
-        background: '#020617', border: '1px solid var(--accent-coral)',
+        background: 'var(--bg-primary)', border: '1px solid var(--accent-coral)',
         maxWidth: '500px', width: '100%', padding: '24px', borderRadius: '16px',
         boxShadow: '0 0 30px rgba(251, 113, 133, 0.15)'
       }}>
@@ -286,7 +286,7 @@ function AIRiskExplainerModal({ show, onClose, city, aiRiskData }) {
             <Brain size={24} style={{ color: 'var(--accent-coral)' }} />
             AI Risk Breakdown
           </h2>
-          <button className="btn btn-ghost" onClick={onClose} style={{ padding: '8px' }}>✕</button>
+          <button className="btn btn-ghost" onClick={onClose} style={{ padding: '8px' }}>âœ•</button>
         </div>
         
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '24px' }}>
@@ -344,13 +344,13 @@ function Dashboard() {
       if (planId && wId) {
         policyApi.purchase({ workerId: Number(wId), planId: Number(planId) })
           .then(() => {
-            setPaymentToast('🎉 Payment successful! Your new policy is now active.');
+            setPaymentToast('ðŸŽ‰ Payment successful! Your new policy is now active.');
           })
           .catch(() => {
-            setPaymentToast('✅ Payment received! Policy will activate shortly.');
+            setPaymentToast('âœ… Payment received! Policy will activate shortly.');
           });
       } else {
-        setPaymentToast('✅ Payment completed successfully!');
+        setPaymentToast('âœ… Payment completed successfully!');
       }
       
       // Clean the URL
@@ -406,8 +406,8 @@ function Dashboard() {
   if (!dashboard) return null;
 
   const formatCurrency = (val) => {
-    if (!val) return '₹0';
-    return '₹' + Number(val).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+    if (!val) return 'â‚¹0';
+    return 'â‚¹' + Number(val).toLocaleString('en-IN', { maximumFractionDigits: 0 });
   };
 
   const getGreeting = () => {
@@ -435,7 +435,7 @@ function Dashboard() {
       {/* Header */}
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 'var(--space-md)' }}>
         <div>
-          <h1 className="animate-fade-in-up gradient-text">{getGreeting()}, {dashboard.workerName?.split(' ')[0]} 👋</h1>
+          <h1 className="animate-fade-in-up gradient-text">{getGreeting()}, {dashboard.workerName?.split(' ')[0]} ðŸ‘‹</h1>
           <p className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>Here's your insurance overview for today</p>
         </div>
         
@@ -486,7 +486,7 @@ function Dashboard() {
           style={{ padding: '4px 10px', fontSize: '0.78rem' }}
         >
           <RefreshCw size={13} style={{ animation: isDetecting ? 'spin 1s linear infinite' : 'none' }} />
-          {isDetecting ? 'Detecting…' : 'Refresh Location'}
+          {isDetecting ? 'Detectingâ€¦' : 'Refresh Location'}
         </button>
       </div>
 
@@ -531,7 +531,7 @@ function Dashboard() {
           <div style={{ flex: 1, position: 'relative' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '8px' }}>
               <div>
-                <h3 style={{ color: 'var(--text-primary)', margin: 0, fontSize: '1.1rem' }}>Daily Risk Score — {city}</h3>
+                <h3 style={{ color: 'var(--text-primary)', margin: 0, fontSize: '1.1rem' }}>Daily Risk Score â€” {city}</h3>
                 <button 
                   onClick={() => setShowRiskModal(true)}
                   className="btn btn-ghost" 
@@ -678,7 +678,7 @@ function Dashboard() {
           <div className="glass-card empty-state">
             <div className="empty-state-icon"><Shield size={28} /></div>
             <h3>No active policies</h3>
-            <p>Get protected today — <Link to="/plans">browse insurance plans</Link></p>
+            <p>Get protected today â€” <Link to="/plans">browse insurance plans</Link></p>
           </div>
         )}
       </div>
@@ -740,7 +740,7 @@ function Dashboard() {
           <div>
             <h4 style={{ color: 'var(--accent-violet)', marginBottom: '6px', fontSize: '0.95rem' }}>How Parametric Insurance Works</h4>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 1.6 }}>
-              GigShield AI monitors real-time weather and environmental data. When conditions exceed your policy's thresholds (e.g. rainfall &gt; 50mm, AQI &gt; 300), a claim is <strong style={{ color: 'var(--text-primary)' }}>automatically triggered</strong> and payout is processed — no forms needed.
+              GigShield AI monitors real-time weather and environmental data. When conditions exceed your policy's thresholds (e.g. rainfall &gt; 50mm, AQI &gt; 300), a claim is <strong style={{ color: 'var(--text-primary)' }}>automatically triggered</strong> and payout is processed â€” no forms needed.
             </p>
           </div>
         </div>
@@ -753,3 +753,4 @@ function Dashboard() {
 }
 
 export default Dashboard;
+

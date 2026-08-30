@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+﻿import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { claimApi, payoutApi } from '../api/api.js';
 import { DashboardSkeleton } from '../components/ui/SkeletonLoader.jsx';
@@ -172,8 +172,8 @@ function Analytics() {
   const filteredPayouts = filterByDateRange(payouts);
 
   const formatCurrency = (val) => {
-    if (!val) return '₹0';
-    return '₹' + Number(val).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+    if (!val) return 'â‚¹0';
+    return 'â‚¹' + Number(val).toLocaleString('en-IN', { maximumFractionDigits: 0 });
   };
 
   // Export charts as PNG
@@ -418,7 +418,7 @@ function Analytics() {
           <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
             <strong style={{ color: Number(periodChange) >= 0 ? 'var(--accent-amber)' : 'var(--accent-emerald)' }}>
               {Number(periodChange) >= 0 ? '+' : ''}{periodChange}%
-            </strong> claims vs previous {DATE_RANGES.find(r => r.key === dateRange)?.label?.toLowerCase()} ({prevPeriodCount} → {totalClaims})
+            </strong> claims vs previous {DATE_RANGES.find(r => r.key === dateRange)?.label?.toLowerCase()} ({prevPeriodCount} â†’ {totalClaims})
           </span>
         </div>
       )}
@@ -448,7 +448,7 @@ function Analytics() {
       </div>
 
       {/* Protocol Treasury TVL Banner */}
-      <div className="glass-card animate-fade-in-up" style={{ marginTop: 'var(--space-xl)', background: 'linear-gradient(90deg, #020617, #0f172a)', border: '1px solid var(--border-color)' }}>
+      <div className="glass-card animate-fade-in-up" style={{ marginTop: 'var(--space-xl)', background: 'linear-gradient(90deg, var(--bg-primary), var(--bg-card))', border: '1px solid var(--border-color)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
           <div>
             <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>Protocol Treasury (TVL)</div>
@@ -484,11 +484,11 @@ function Analytics() {
             {[...filteredPayouts.slice(0, 8), ...filteredPayouts.slice(0, 8)].map((p, i) => (
               <div key={i} className="ticker-item">
                 <span className="ticker-hash">0x{Math.random().toString(16).substring(2, 10).toUpperCase()}</span>
-                <span>•</span>
+                <span>â€¢</span>
                 <span>{p.claim?.policy?.worker?.city || 'India'}</span>
-                <span>•</span>
+                <span>â€¢</span>
                 <span className="ticker-amt">{formatCurrency(p.amount)}</span>
-                <span>•</span>
+                <span>â€¢</span>
                 <span style={{ color: p.status === 'COMPLETED' ? '#10b981' : '#f59e0b' }}>{p.status}</span>
               </div>
             ))}
@@ -537,7 +537,7 @@ function Analytics() {
           </div>
         </div>
 
-        {/* Risk Distribution — donut chart */}
+        {/* Risk Distribution â€” donut chart */}
         <div className="analytics-card">
           <h3><BarChart3 size={18} style={{ color: 'var(--accent-emerald)' }} /> Risk Score Distribution</h3>
           {riskSegments.length > 0 ? (
@@ -613,3 +613,4 @@ function Analytics() {
 }
 
 export default Analytics;
+

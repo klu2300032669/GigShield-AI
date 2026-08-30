@@ -12,19 +12,19 @@ function Landing() {
   }
 
   return (
-    <div className="landing-page" style={{ minHeight: '100vh', background: '#020617', color: '#f8fafc', overflowX: 'hidden' }}>
+    <div className="landing-page" style={{ minHeight: '100vh', background: 'var(--bg-primary)', color: 'var(--text-primary)', overflowX: 'hidden' }}>
       
       <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '24px 5%', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{ background: 'linear-gradient(135deg, var(--accent-indigo), var(--accent-purple))', padding: '10px', borderRadius: '12px' }}>
-            <Shield size={24} style={{ color: '#fff' }} />
+            <Shield size={24} style={{ color: 'var(--text-primary)' }} />
           </div>
           <span style={{ fontSize: '1.5rem', fontWeight: 800, letterSpacing: '-0.5px' }}>
             GigShield<span style={{ color: 'var(--accent-purple)' }}>.AI</span>
           </span>
         </div>
         <div style={{ display: 'flex', gap: '16px' }}>
-          <Link to="/login" className="btn btn-ghost" style={{ color: '#cbd5e1' }}>Sign In</Link>
+          <Link to="/login" className="btn btn-ghost" style={{ color: 'var(--text-secondary)' }}>Sign In</Link>
           <Link to="/register" className="btn btn-primary" style={{ background: 'var(--accent-purple)', borderColor: 'var(--accent-purple)' }}>Get Protected</Link>
         </div>
       </nav>
@@ -59,7 +59,7 @@ function Landing() {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px' }}>
-            <div className="glass-card" style={{ padding: '32px', background: '#0f172a' }}>
+            <div className="glass-card" style={{ padding: '32px', background: 'var(--bg-card)' }}>
               <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: 'rgba(56, 189, 248, 0.1)', color: 'var(--accent-sky)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px' }}>
                 <CloudLightning size={28} />
               </div>
@@ -67,7 +67,7 @@ function Landing() {
               <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}>Our nodes constantly monitor Open-Meteo APIs. If rainfall exceeds 30mm or heat crosses 42°C in your zone, the system alerts immediately.</p>
             </div>
 
-            <div className="glass-card" style={{ padding: '32px', background: '#0f172a' }}>
+            <div className="glass-card" style={{ padding: '32px', background: 'var(--bg-card)' }}>
               <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: 'rgba(16, 185, 129, 0.1)', color: 'var(--accent-emerald)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px' }}>
                 <Zap size={28} />
               </div>
@@ -75,7 +75,7 @@ function Landing() {
               <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}>Forget manual paperwork. Our Smart Contracts automatically verify the weather data and execute payouts instantly to your wallet.</p>
             </div>
 
-            <div className="glass-card" style={{ padding: '32px', background: '#0f172a' }}>
+            <div className="glass-card" style={{ padding: '32px', background: 'var(--bg-card)' }}>
               <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: 'rgba(244, 63, 94, 0.1)', color: 'var(--accent-rose)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px' }}>
                 <Activity size={28} />
               </div>
@@ -89,7 +89,7 @@ function Landing() {
       <footer style={{ padding: '40px 5%', textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.05)', color: 'var(--text-muted)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '16px' }}>
           <Shield size={20} />
-          <span style={{ fontWeight: 600, color: '#fff' }}>GigShield AI</span>
+          <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>GigShield AI</span>
         </div>
         <p>© 2026 GigShield Project. Built for the Gig Economy.</p>
       </footer>
@@ -98,3 +98,4 @@ function Landing() {
 }
 
 export default Landing;
+
