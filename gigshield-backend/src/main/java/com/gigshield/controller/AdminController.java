@@ -26,6 +26,7 @@ public class AdminController {
     private final EnvironmentalEventService environmentalEventService;
     private final AuditService auditService;
     private final NotificationService notificationService;
+    private final WeatherFetchService weatherFetchService;
 
     // ---- Platform Stats ----
     @GetMapping("/stats")
@@ -123,6 +124,15 @@ public class AdminController {
     public ResponseEntity<ApiResponse<List<EnvironmentalEvent>>> getAllEvents() {
         List<EnvironmentalEvent> events = environmentalEventService.getRecentEvents();
         return ResponseEntity.ok(ApiResponse.success(events));
+    }
+
+    @PostMapping("/simulate-event")
+    @Operation(summary = "Manually trigger severe weather simulation and auto-adjudication")
+    public ResponseEntity<ApiResponse<EnvironmentalEvent>> simulateEvent(@RequestBody Map<String, String> body) {
+        String city = body.getOrDefault("city", "Mumbai");
+        String type = body.getOrDefault("type", "HEAVY_RAIN");
+        EnvironmentalEvent event = weatherFetchService.simulateSevereWeather(city, type);
+        return ResponseEntity.ok(ApiResponse.success("Simulation triggered and claims processed", event));
     }
 
     // ---- Audit Log Viewer ----
