@@ -102,12 +102,30 @@ export function LocationProvider({ children }) {
     } catch (err) {
       // Geolocation denied or failed
       setPermissionState('denied');
+      
+      // Real-World Feature: IP-Based Fallback Detection
+      try {
+        const ipRes = await fetch('https://ipapi.co/json/');
+        if (ipRes.ok) {
+          const ipData = await ipRes.json();
+          if (ipData.city) {
+            setCity(ipData.city);
+            setLocationError('GPS blocked. Using IP-based location (' + ipData.city + ').');
+            setIsDetecting(false);
+            return;
+          }
+        }
+      } catch (ipErr) {
+        console.error('IP Fallback failed', ipErr);
+      }
+
+      // Final fallback if both fail
       const errorMessages = {
-        1: 'Location access denied. Please enable location permissions in your browser settings.',
-        2: 'Location unavailable. Please check your device settings.',
-        3: 'Location request timed out. Please try again.',
+        1: 'Location access denied. Defaulting to Mumbai.',
+        2: 'Location unavailable. Defaulting to Mumbai.',
+        3: 'Location request timed out. Defaulting to Mumbai.',
       };
-      setLocationError(errorMessages[err.code] || 'Could not detect your location.');
+      setLocationError(errorMessages[err.code] || 'Could not detect location. Defaulting to Mumbai.');
       if (!city) {
         setCity('Mumbai');
       }

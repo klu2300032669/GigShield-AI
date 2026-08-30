@@ -637,9 +637,16 @@ def _fallback_prediction(request: RiskPredictionRequest) -> RiskPredictionRespon
 async def ai_chat(request: ChatRequest):
     msg = request.message.lower()
     ctx = request.context or {}
+    worker_name = ctx.get("worker_name", "")
     
     category = "GENERAL"
-    if any(k in msg for k in ["claim", "payout", "reimbursement", "money"]):
+    
+    # Smarter intent matching
+    if any(k in msg for k in ["hi", "hello", "hey", "hii", "howdy"]):
+        category = "GREETING"
+    elif any(k in msg for k in ["i am", "my name is", "i'm"]):
+        category = "IDENTITY"
+    elif any(k in msg for k in ["claim", "payout", "reimbursement", "money", "file"]):
         category = "CLAIM"
     elif any(k in msg for k in ["risk", "danger", "safe", "score"]):
         category = "RISK"
@@ -648,31 +655,47 @@ async def ai_chat(request: ChatRequest):
     elif any(k in msg for k in ["rain", "weather", "heat", "pollution", "aqi"]):
         category = "WEATHER"
         
-    response_text = "I'm your GigShield AI assistant. "
+    response_text = ""
     suggestions = []
     
-    if category == "CLAIM":
-        response_text += "You can file a claim automatically when environmental conditions exceed your plan's thresholds. "
-        suggestions = ["How do I file a claim?", "What are the payout thresholds?"]
+    if category == "GREETING":
+        name_str = f", {worker_name}" if worker_name and worker_name != "Worker" else ""
+        response_text = f"Hello{name_str}! I'm the GigShield AI assistant. I can help you with risk monitoring, checking coverage, or filing claims."
+        suggestions = ["Check my risk score", "Show my active plans", "How do payouts work?"]
+        
+    elif category == "IDENTITY":
+        # Extract name naively
+        parts = msg.split("i am") if "i am" in msg else msg.split("my name is")
+        name = parts[-1].strip().title() if len(parts) > 1 else worker_name
+        response_text = f"Nice to meet you, {name}! As your GigShield AI, I'm constantly analyzing environmental data to protect you while you work."
+        suggestions = ["What is GigShield?", "Do I have any risks today?"]
+        
+    elif category == "CLAIM":
+        response_text = "With GigShield, claims are parametric. This means if weather conditions exceed your plan's thresholds, payouts are triggered automatically! You can also manually review claims in your dashboard."
+        suggestions = ["What are the payout thresholds?", "View my claims"]
+        
     elif category == "RISK":
         score = ctx.get("risk_score")
         if score is not None:
-            response_text += f"I see your current risk score is {score}. "
+            response_text = f"Your current risk score is {score}. "
             if float(score) > 0.7:
-                response_text += "This is high risk. Please stay safe. "
-        response_text += "We monitor real-time weather and API data to calculate your risk."
-        suggestions = ["How is my risk calculated?", "What should I do if risk is high?"]
+                response_text += "⚠️ This is high risk! Please stay safe. "
+        response_text += "Our ML models monitor real-time weather and API data to calculate your risk constantly."
+        suggestions = ["How is risk calculated?", "Check active weather alerts"]
+        
     elif category == "PLAN":
-        response_text += "We offer various plans covering rain, extreme heat, and pollution. "
-        suggestions = ["Show me available plans", "What does my current plan cover?"]
+        response_text = "GigShield offers parametric plans covering rain, extreme heat, and pollution. Once a threshold is breached, the plan pays out instantly to your connected Stripe account."
+        suggestions = ["Show me available plans", "Upgrade my coverage"]
+        
     elif category == "WEATHER":
         city = ctx.get("city")
-        if city:
-            response_text += f"We are tracking the weather conditions in {city}. "
-        response_text += "Heavy rain, extreme heat, and high pollution can trigger payouts."
-        suggestions = ["Check current weather", "Are there active alerts?"]
+        if city and city != "Unknown Location":
+            response_text = f"We are actively tracking the weather in {city}. "
+        response_text += "Heavy rain, extreme heat, and high AQI pollution are automatically detected by our external APIs to trigger payouts."
+        suggestions = ["Check current weather in my city", "Are there active alerts?"]
+        
     else:
-        response_text += "How can I help you with your insurance coverage today?"
+        response_text = "I'm your GigShield AI assistant. I specialize in parametric insurance logic, ML risk models, and automated claims. How can I help you today?"
         suggestions = ["Tell me about GigShield", "Check my risk score", "File a claim"]
         
     return ChatResponse(
