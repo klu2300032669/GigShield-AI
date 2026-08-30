@@ -108,6 +108,21 @@ public class WeatherFetchService {
         return eventsCreated;
     }
 
+    public EnvironmentalEvent simulateSevereWeather(String city, String type) {
+        EnvironmentalEvent savedEvent;
+        log.info("⚠️ Admin triggered AI Disaster Simulation for {} ({})", city, type);
+        if (type.equalsIgnoreCase("HEAVY_RAIN")) {
+            savedEvent = createEvent(city, EnvironmentalEvent.EventType.HEAVY_RAIN, EnvironmentalEvent.Severity.CRITICAL,
+                    BigDecimal.valueOf(150.0), BigDecimal.valueOf(25.0), 50);
+            triggerParametricClaims(savedEvent, city, com.gigshield.model.InsurancePlan.CoverageType.RAIN);
+        } else {
+            savedEvent = createEvent(city, EnvironmentalEvent.EventType.EXTREME_HEAT, EnvironmentalEvent.Severity.CRITICAL,
+                    BigDecimal.ZERO, BigDecimal.valueOf(48.5), 100);
+            triggerParametricClaims(savedEvent, city, com.gigshield.model.InsurancePlan.CoverageType.HEAT);
+        }
+        return savedEvent;
+    }
+
     private void triggerParametricClaims(EnvironmentalEvent event, String city, com.gigshield.model.InsurancePlan.CoverageType targetCoverage) {
         if (policyRepository == null || claimService == null) return;
         List<com.gigshield.model.Policy> activePolicies = policyRepository.findByStatus(com.gigshield.model.Policy.PolicyStatus.ACTIVE);
