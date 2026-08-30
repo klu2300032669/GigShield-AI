@@ -46,7 +46,7 @@ function Settings() {
     setProfileLoading(true);
     try {
       const res = await workerApi.updateWorker(worker.id, { fullName: profileForm.fullName, phone: profileForm.phone });
-      updateWorkerProfile(res.data.data);
+      updateWorkerProfile(res.data);
       showSuccess('Success', 'Profile updated successfully.');
       setIsEditingProfile(false);
     } catch (err) {
