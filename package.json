@@ -1,7 +1,0 @@
-{
-  "name": "gigshield-root",
-  "version": "1.0.0",
-  "scripts": {
-    "build": "cd gigshield-frontend && npm install && npm run build"
-  }
-}
