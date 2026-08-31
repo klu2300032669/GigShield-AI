@@ -288,6 +288,7 @@ function AdminDashboard() {
         {[
           { key: 'overview', label: `Workers (${workers.length})` },
           { key: 'claims', label: `Claims (${claims.length})` },
+          { key: 'ops-center', label: 'Disaster Ops Center' },
         ].map(tab => (
           <button
             key={tab.key}
