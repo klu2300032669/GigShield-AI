@@ -55,6 +55,6 @@ public class InsurancePlan {
     }
 
     public enum BillingCycle {
-        WEEKLY, MONTHLY
+        SHIFT, WEEKLY, MONTHLY
     }
 }

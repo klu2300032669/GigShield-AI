@@ -10,7 +10,8 @@ VALUES
 ('Heat Guard', 'Protection against extreme heat events when temperatures exceed safe working limits.', 'HEAT', 39.00, 400.00, 'WEEKLY', true),
 ('AQI Protect', 'Coverage for high pollution days when air quality index makes outdoor delivery unsafe.', 'POLLUTION', 59.00, 600.00, 'MONTHLY', true),
 ('GigShield Total', 'Comprehensive all-weather coverage for rain, heat, and pollution events combined.', 'ALL', 199.00, 2000.00, 'MONTHLY', true),
-('GigShield Total Weekly', 'Weekly comprehensive coverage for all environmental disruption types.', 'ALL', 79.00, 800.00, 'WEEKLY', true)
+('GigShield Total Weekly', 'Weekly comprehensive coverage for all environmental disruption types.', 'ALL', 79.00, 800.00, 'WEEKLY', true),
+('GigShield Shift Protect', 'On-Demand 4-hour micro-coverage for sudden weather changes while you are online.', 'ALL', 9.00, 300.00, 'SHIFT', true)
 ON CONFLICT DO NOTHING;
 
 

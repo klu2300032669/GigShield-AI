@@ -1,4 +1,6 @@
-import { useState } from 'react';
+﻿import os
+filepath = r'c:\Users\DELL\OneDrive\Desktop\PROJECT 2327\gigshield-frontend\src\components\PaymentModal.jsx'
+content = '''import { useState } from 'react';
 import { CreditCard, CheckCircle2, Loader2, X, Shield, Lock, Smartphone } from 'lucide-react';
 import { policyApi } from '../api/api.js';
 import '../index.css';
@@ -119,3 +121,6 @@ export default function PaymentModal({ plan, workerId, onClose, onSuccess }) {
     </div>
   );
 }
+'''
+with open(filepath, 'w', encoding='utf-8') as f:
+    f.write(content)
