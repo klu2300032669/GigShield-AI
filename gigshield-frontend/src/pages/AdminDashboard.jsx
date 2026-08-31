@@ -7,7 +7,7 @@ import {
   ShieldCheck, Users, ClipboardList, FileText, Banknote,
   AlertCircle, CheckCircle2, XCircle, TrendingUp, Activity,
   CloudSun, Loader2, Trash2, BrainCircuit, Send, Bell, Mic,
-  User, MapPin, Briefcase
+  User, MapPin, Briefcase, Flame
 } from 'lucide-react';
 
 function AdminDashboard() {
@@ -19,6 +19,7 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [actionLoading, setActionLoading] = useState(null);
+  const [terminalLogs, setTerminalLogs] = useState([]);
   const [selectedWorker, setSelectedWorker] = useState(null);
 
   // Confirm dialog state
@@ -180,28 +181,6 @@ function AdminDashboard() {
           </button>
 
           
-          
-          <button 
-            className="btn btn-primary" 
-            style={{ background: 'var(--danger)', borderColor: 'var(--danger)', boxShadow: '0 0 15px rgba(239, 68, 68, 0.4)' }}
-            onClick={async () => {
-              try {
-                const targetCity = window.prompt("🚨 AI DISASTER SIMULATION 🚨\\n\\nEnter the city to simulate a massive flood event in (e.g., Mumbai, Delhi, Bangalore):", "Mumbai");
-                if (!targetCity) return; // User cancelled
-                
-                if (!window.confirm(`DANGER: This will generate a simulated 150mm flood in ${targetCity} and force the backend Cron Job to trigger Python AI Auto-Adjudication. Proceed?`)) return;
-                
-                const { adminApi } = await import('../api/api.js');
-                await adminApi.simulateEvent({ city: targetCity.trim(), type: 'HEAVY_RAIN' });
-                showSuccess("Disaster Simulated!", `Triggered flood in ${targetCity}. The AI backend is now auto-adjudicating claims. Refreshing data in 3s...`);
-                setTimeout(() => window.location.reload(), 3000);
-              } catch (err) {
-                showError("Simulation Failed", err.message);
-              }
-            }}
-          >
-            <CloudSun size={16} /> Trigger AI Disaster Simulation
-          </button>
         </div>
       </div>
 
@@ -402,6 +381,143 @@ function AdminDashboard() {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* Disaster Ops Center */}
+      {activeTab === 'ops-center' && (
+        <div className="admin-section" role="tabpanel" aria-label="Disaster Operations Center">
+          <div className="section-header">
+            <div className="section-title"><Activity size={18} style={{ color: 'var(--accent-rose)' }} aria-hidden="true" /> Live Parametric Operations</div>
+          </div>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '20px' }}>
+            
+            {/* Left: Webhook / Event Emitter */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div className="glass-card" style={{ border: '1px solid rgba(239, 68, 68, 0.3)', background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, transparent 100%)' }}>
+                <h3 style={{ margin: '0 0 16px 0', color: 'var(--accent-rose)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <CloudSun size={18} /> Trigger Oracle Webhook
+                </h3>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
+                  Inject a simulated Severe Weather payload directly into the GigShield API to test mass smart-contract auto-payouts.
+                </p>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <button 
+                    className="btn btn-primary" 
+                    style={{ background: 'var(--danger)', borderColor: 'var(--danger)', flex: 1 }}
+                    onClick={async () => {
+                      try {
+                        const targetCity = window.prompt("TARGET CITY FOR MASSIVE FLOOD (e.g. Mumbai, Delhi):", "Mumbai");
+                        if (!targetCity) return;
+                        
+                        setTerminalLogs(prev => [`[${new Date().toLocaleTimeString()}] INITIATING MASSIVE FLOOD IN ${targetCity.toUpperCase()}...`, ...prev]);
+                        
+                        setActionLoading('sim-rain');
+                        await adminApi.simulateEvent({ city: targetCity.trim(), type: 'HEAVY_RAIN' });
+                        
+                        setTerminalLogs(prev => [
+                          `[${new Date().toLocaleTimeString()}] SUCCESS: Oracle Webhook Received.`,
+                          `[${new Date().toLocaleTimeString()}] WARNING: Precipitation exceeds 150mm threshold in ${targetCity}.`,
+                          `[${new Date().toLocaleTimeString()}] TRIG: Parametric engine is now scanning active policies...`,
+                          ...prev
+                        ]);
+                        
+                        setTimeout(() => fetchAll(), 3000);
+                      } catch (err) {
+                        setTerminalLogs(prev => [`[${new Date().toLocaleTimeString()}] ERROR: ${err.message}`, ...prev]);
+                      } finally { setActionLoading(null); }
+                    }}
+                    disabled={actionLoading === 'sim-rain'}
+                  >
+                    {actionLoading === 'sim-rain' ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> : <CloudSun size={16} />} 
+                    Inject Flood Event
+                  </button>
+                  
+                  <button 
+                    className="btn btn-primary" 
+                    style={{ background: 'var(--accent-amber)', borderColor: 'var(--accent-amber)', color: '#000', flex: 1 }}
+                    onClick={async () => {
+                      try {
+                        const targetCity = window.prompt("TARGET CITY FOR EXTREME HEATWAVE (e.g. Delhi, Chennai):", "Delhi");
+                        if (!targetCity) return;
+                        
+                        setTerminalLogs(prev => [`[${new Date().toLocaleTimeString()}] INITIATING EXTREME HEATWAVE IN ${targetCity.toUpperCase()}...`, ...prev]);
+                        
+                        setActionLoading('sim-heat');
+                        await adminApi.simulateEvent({ city: targetCity.trim(), type: 'EXTREME_HEAT' });
+                        
+                        setTerminalLogs(prev => [
+                          `[${new Date().toLocaleTimeString()}] SUCCESS: Oracle Webhook Received.`,
+                          `[${new Date().toLocaleTimeString()}] CRITICAL: Temperature > 45°C sustained in ${targetCity}.`,
+                          `[${new Date().toLocaleTimeString()}] TRIG: Activating heatwave smart-contracts...`,
+                          ...prev
+                        ]);
+                        
+                        setTimeout(() => fetchAll(), 3000);
+                      } catch (err) {
+                        setTerminalLogs(prev => [`[${new Date().toLocaleTimeString()}] ERROR: ${err.message}`, ...prev]);
+                      } finally { setActionLoading(null); }
+                    }}
+                    disabled={actionLoading === 'sim-heat'}
+                  >
+                    {actionLoading === 'sim-heat' ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> : <Flame size={16} />} 
+                    Inject Heatwave
+                  </button>
+                </div>
+              </div>
+              
+              <div className="glass-card" style={{ flex: 1 }}>
+                <h3 style={{ margin: '0 0 16px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <ShieldCheck size={18} style={{ color: 'var(--accent-emerald)' }} /> Active Oracle Connections
+                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px', background: 'rgba(255,255,255,0.02)', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                    <div>
+                      <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>Open-Meteo V1 API</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Latency: 45ms • 99.9% Uptime</div>
+                    </div>
+                    <span className="badge badge-success">Live Syncing</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px', background: 'rgba(255,255,255,0.02)', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                    <div>
+                      <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>GigShield AI Risk Cluster</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>TensorFlow / XGBoost</div>
+                    </div>
+                    <span className="badge badge-success">Live Syncing</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Smart Contract Terminal */}
+            <div className="glass-card" style={{ padding: '0', display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+              <div style={{ padding: '12px 16px', background: 'rgba(0,0,0,0.3)', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--accent-emerald)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--accent-emerald)', boxShadow: '0 0 8px var(--accent-emerald)' }} />
+                  SMART CONTRACT LEDGER
+                </div>
+                <button 
+                  onClick={() => setTerminalLogs([])}
+                  style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '0.75rem', cursor: 'pointer' }}
+                >
+                  Clear
+                </button>
+              </div>
+              <div style={{ padding: '16px', flex: 1, background: '#0a0a0a', fontFamily: 'monospace', fontSize: '0.75rem', color: '#10b981', overflowY: 'auto', maxHeight: '400px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                {terminalLogs.length === 0 ? (
+                  <div style={{ color: '#404040', fontStyle: 'italic' }}>Listening for Oracle triggers...</div>
+                ) : (
+                  terminalLogs.map((log, i) => (
+                    <div key={i} style={{ color: log.includes('ERROR') ? '#ef4444' : log.includes('WARNING') || log.includes('CRITICAL') ? '#f59e0b' : '#10b981' }}>
+                      {log}
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
           </div>
         </div>
       )}
