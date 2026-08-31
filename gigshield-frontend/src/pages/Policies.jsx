@@ -12,99 +12,109 @@ import {
 function SmartContractViewer({ policy, onClose }) {
   if (!policy) return null;
 
-  const hash = `0x${(policy.id * 893452).toString(16).padEnd(40, '0')}`;
+  const hash = "0x" + (policy.id * 893452).toString(16).padEnd(40, '0');
   
-  // Fake a solidity-style contract string dynamically based on the coverage type
-  let conditions = '';
-  if (policy.coverageType === 'RAIN' || policy.coverageType === 'ALL') {
-    conditions += `    require(oracle.getRainfall(worker.city) > 30mm, "Rainfall threshold not met");\n`;
-  }
-  if (policy.coverageType === 'HEAT' || policy.coverageType === 'ALL') {
-    conditions += `    require(oracle.getTemperature(worker.city) > 42C, "Heat threshold not met");\n`;
-  }
-  
-  const contractCode = `// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
-
-import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
-
-contract GigShieldParametric {
-  address public protocolTreasury = 0x8a9C...3b1;
-  address public workerWallet = 0x${Math.random().toString(16).slice(2,10)}...;
-
-  struct Policy {
-    uint256 maxPayout;
-    string city;
-    bool isActive;
-  }
-
-  Policy public activePolicy = Policy(${policy.maxPayout}, "${policy.planName}", true);
-
-  function executePayout() external {
-    require(activePolicy.isActive, "Policy expired");
-${conditions}
-    // Triggers instant stablecoin transfer via Protocol Treasury
-    payable(workerWallet).transfer(activePolicy.maxPayout);
-    
-    emit PayoutExecuted(workerWallet, activePolicy.maxPayout);
-  }
-}`;
-
   return (
-    <div className="modal-overlay" onClick={onClose} style={{
-      position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-      backgroundColor: 'rgba(0, 0, 0, 0.8)', backdropFilter: 'blur(8px)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
-      padding: '20px'
-    }}>
-      <div className="glass-card animate-fade-in-up" onClick={e => e.stopPropagation()} style={{
-        background: 'var(--bg-primary)', border: '1px solid var(--accent-purple)',
-        maxWidth: '700px', width: '100%', padding: '0', borderRadius: '12px',
-        boxShadow: '0 0 40px rgba(139, 92, 246, 0.15)', overflow: 'hidden'
-      }}>
-        {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 24px', background: 'rgba(139, 92, 246, 0.1)', borderBottom: '1px solid rgba(139, 92, 246, 0.2)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ padding: '8px', background: 'rgba(139, 92, 246, 0.2)', borderRadius: '8px' }}>
-              <Code size={20} style={{ color: 'var(--accent-purple)' }} />
-            </div>
-            <div>
-              <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-primary)' }}>Live Smart Contract</h3>
-              <div style={{ fontSize: '0.8rem', color: 'var(--accent-purple)', fontFamily: 'monospace', marginTop: 4 }}>
-                {hash}
-              </div>
-            </div>
-          </div>
-          <button className="btn btn-ghost" onClick={onClose} style={{ padding: '8px' }}>✕</button>
-        </div>
-
-        {/* Status bar */}
-        <div style={{ display: 'flex', gap: '24px', padding: '16px 24px', background: 'var(--bg-card)', borderBottom: '1px solid #1e293b' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.85rem' }}>
-            <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--accent-emerald)', boxShadow: '0 0 10px var(--accent-emerald)' }} />
-            <span style={{ color: 'var(--text-secondary)' }}>Status:</span>
-            <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>Active & Monitoring</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.85rem' }}>
-            <Lock size={14} style={{ color: 'var(--text-muted)' }} />
-            <span style={{ color: 'var(--text-secondary)' }}>Oracle:</span>
-            <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>Open-Meteo Node</span>
-          </div>
-        </div>
-
-        {/* Code Block */}
-        <div style={{ padding: '24px', background: 'var(--bg-secondary)', overflowX: 'auto' }}>
-          <pre style={{ margin: 0, fontFamily: '"Fira Code", monospace', fontSize: '0.85rem', color: '#a5b4fc', lineHeight: 1.6 }}>
-            <code>{contractCode}</code>
-          </pre>
+    <div className="modal-overlay" onClick={onClose} style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(5px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
+      <div className="glass-card animate-fade-in-up" onClick={e => e.stopPropagation()} style={{ background: 'var(--bg-primary)', border: '1px solid var(--accent-emerald)', maxWidth: '600px', width: '100%', padding: '0', borderRadius: '16px', boxShadow: '0 20px 40px rgba(16, 185, 129, 0.2)', overflow: 'hidden' }}>
+        <div style={{ background: 'rgba(16, 185, 129, 0.1)', padding: '20px', borderBottom: '1px solid rgba(16, 185, 129, 0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h3 style={{ margin: 0, color: 'var(--accent-emerald)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Shield size={20} /> Active Parametric Triggers
+          </h3>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><XCircle size={20} /></button>
         </div>
         
-        {/* Footer */}
-        <div style={{ padding: '16px 24px', background: 'rgba(16, 185, 129, 0.05)', borderTop: '1px solid rgba(16, 185, 129, 0.1)', display: 'flex', alignItems: 'center', gap: 12 }}>
-          <CheckCircle2 size={16} style={{ color: 'var(--accent-emerald)' }} />
-          <span style={{ fontSize: '0.85rem', color: 'var(--accent-emerald)' }}>
-            This contract is cryptographically signed and secured on the ledger. Payouts execute automatically.
-          </span>
+        <div style={{ padding: '24px' }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '24px' }}>
+            This policy is governed by an automated Smart Contract. If Oracle telemetry detects any of the following conditions in your city, the payout of <strong>₹{policy.maxPayout}</strong> will be deposited instantly.
+          </p>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
+            {(policy.coverageType === 'RAIN' || policy.coverageType === 'ALL') && (
+              <div style={{ background: 'rgba(56, 189, 248, 0.1)', border: '1px solid rgba(56, 189, 248, 0.2)', padding: '16px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <CloudRain size={24} style={{ color: 'var(--accent-sky)' }} />
+                <div>
+                  <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Heavy Rainfall Exceeds 150mm</div>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Verified via Open-Meteo V1 API</div>
+                </div>
+              </div>
+            )}
+            
+            {(policy.coverageType === 'HEAT' || policy.coverageType === 'ALL') && (
+              <div style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.2)', padding: '16px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <Flame size={24} style={{ color: 'var(--accent-amber)' }} />
+                <div>
+                  <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Extreme Heat Exceeds 45°C</div>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Sustained for 4+ hours</div>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          <div style={{ background: '#0a0a0a', padding: '16px', borderRadius: '8px', fontFamily: 'monospace', fontSize: '0.75rem', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+            <div><span style={{ color: '#404040' }}>// Contract Hash (Immutable)</span></div>
+            <div>{hash}</div>
+            <div style={{ marginTop: '8px' }}><span style={{ color: '#404040' }}>// Status</span></div>
+            <div style={{ color: policy.status === 'ACTIVE' ? '#10b981' : '#ef4444' }}>{policy.status}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+function InvoiceModal({ policy, worker, onClose }) {
+  if (!policy) return null;
+  return (
+    <div className="modal-overlay" onClick={onClose} style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(5px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
+      <div className="glass-card animate-fade-in-up" onClick={e => e.stopPropagation()} style={{ background: '#ffffff', color: '#000000', maxWidth: '500px', width: '100%', padding: '32px', borderRadius: '8px', boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #e5e7eb', paddingBottom: '16px', marginBottom: '24px' }}>
+          <div>
+            <h2 style={{ margin: '0 0 4px 0', color: '#111827', fontSize: '1.5rem', fontWeight: 800 }}>GigShield</h2>
+            <p style={{ margin: 0, color: '#6b7280', fontSize: '0.85rem' }}>Official Tax Invoice</p>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontWeight: 700, color: '#111827' }}>INVOICE #{policy.id}</div>
+            <div style={{ color: '#6b7280', fontSize: '0.85rem' }}>{new Date(policy.startDate).toLocaleDateString()}</div>
+          </div>
+        </div>
+        
+        <div style={{ marginBottom: '32px' }}>
+          <h4 style={{ margin: '0 0 8px 0', color: '#374151', fontSize: '0.9rem', textTransform: 'uppercase' }}>Billed To:</h4>
+          <div style={{ fontWeight: 600, color: '#111827' }}>{worker?.fullName || 'Gig Worker'}</div>
+          <div style={{ color: '#4b5563', fontSize: '0.9rem' }}>{worker?.email || 'N/A'}</div>
+          <div style={{ color: '#4b5563', fontSize: '0.9rem' }}>City: {worker?.city || 'N/A'}</div>
+        </div>
+        
+        <table style={{ width: '100%', marginBottom: '32px', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr style={{ borderBottom: '1px solid #e5e7eb', textAlign: 'left', color: '#6b7280', fontSize: '0.85rem' }}>
+              <th style={{ padding: '8px 0' }}>Description</th>
+              <th style={{ padding: '8px 0', textAlign: 'right' }}>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style={{ padding: '16px 0', color: '#111827', fontWeight: 500 }}>
+                {policy.planName}
+                <div style={{ fontSize: '0.8rem', color: '#6b7280', marginTop: '4px', fontWeight: 400 }}>
+                  Valid: {new Date(policy.startDate).toLocaleDateString()} - {new Date(policy.endDate).toLocaleDateString()}
+                </div>
+              </td>
+              <td style={{ padding: '16px 0', textAlign: 'right', color: '#111827', fontWeight: 600 }}>₹{policy.premiumAmount}</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '2px solid #e5e7eb', paddingTop: '16px', marginBottom: '32px', fontWeight: 700, fontSize: '1.2rem', color: '#111827' }}>
+          <span>Total Paid</span>
+          <span>₹{policy.premiumAmount}</span>
+        </div>
+        
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button onClick={() => window.print()} className="btn btn-primary" style={{ flex: 1, background: '#111827', color: '#fff', border: 'none' }}>Print / Save as PDF</button>
+          <button onClick={onClose} className="btn btn-outline" style={{ flex: 1, borderColor: '#d1d5db', color: '#374151' }}>Close</button>
         </div>
       </div>
     </div>
@@ -119,6 +129,7 @@ function Policies() {
   const [error, setError] = useState('');
   const [cancelling, setCancelling] = useState(null);
   const [downloading, setDownloading] = useState(null);
+  const [invoicePolicy, setInvoicePolicy] = useState(null);
   const [viewingContract, setViewingContract] = useState(null);
 
   // Confirm dialog state
@@ -157,27 +168,10 @@ function Policies() {
     }
   }, [policyToCancel, showSuccess, showError, fetchPolicies]);
 
-  const handleDownloadInvoice = useCallback(async (policyId) => {
-    setDownloading(policyId);
-    try {
-      const response = await invoiceApi.downloadPolicyInvoice(policyId);
-      const blob = new Blob([response], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `invoice_policy_${policyId}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode.removeChild(link);
-      window.URL.revokeObjectURL(url);
-      showSuccess('Downloaded', 'Policy invoice downloaded.');
-    } catch (err) {
-      console.error('Invoice download failed:', err);
-      showError('Download Failed', 'Could not download policy invoice.');
-    } finally {
-      setDownloading(null);
-    }
-  }, [showSuccess, showError]);
+  const handleDownloadInvoice = (policyId) => {
+    const p = policies.find(x => x.id === policyId);
+    if (p) setInvoicePolicy(p);
+  };
 
   const formatCurrency = (val) => {
     if (!val) return '₹0';

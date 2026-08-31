@@ -28,7 +28,13 @@ public class PolicyService {
 
     @org.springframework.cache.annotation.Cacheable("plans")
     public List<InsurancePlan> getAllActivePlans() {
-        return insurancePlanRepository.findByIsActiveTrue();
+        List<InsurancePlan> allPlans = insurancePlanRepository.findByIsActiveTrue();
+        // Deduplicate by plan name to prevent UI clutter if data.sql ran multiple times
+        java.util.Map<String, InsurancePlan> distinctPlans = new java.util.HashMap<>();
+        for (InsurancePlan plan : allPlans) {
+            distinctPlans.putIfAbsent(plan.getPlanName(), plan);
+        }
+        return new java.util.ArrayList<>(distinctPlans.values());
     }
 
     public List<InsurancePlanResponseDTO> getDynamicPlans(String city, Double rainfall, Double temp, Integer aqi) {
