@@ -76,33 +76,7 @@ function AdminDashboard() {
     }
   };
 
-  const handleAIAnalysis = async (claim) => {
-    try {
-      setActionLoading(`ai-${claim.id}`);
-      const payload = {
-        worker_id: claim.workerId || 0,
-        claim_amount: claim.claimAmount || 0,
-        num_claims_30d: 0,
-        avg_claim_amount: 0,
-        rainfall_mm: 0,
-        temperature_c: 25,
-        aqi: 50,
-        online_hours: 0,
-        delivery_drop_rate: 0
-      };
-      const res = await aiApi.analyzeFraud(payload);
-      const result = res.data;
-      if (result.is_suspicious) {
-        showError('AI Fraud Alert', `High Risk! Anomaly Score: ${result.anomaly_score.toFixed(2)}. Flags: ${result.flags.join(', ')}`);
-      } else {
-        showSuccess('AI Check Passed', `Low Risk. Anomaly Score: ${result.anomaly_score.toFixed(2)}.`);
-      }
-    } catch (err) {
-      showError('AI Service Error', err.response?.data?.detail || err.message || 'Could not reach AI prediction service.');
-    } finally {
-      setActionLoading(null);
-    }
-  };
+
 
   const handleSendNotification = async (e) => {
     e.preventDefault();
@@ -167,31 +141,43 @@ function AdminDashboard() {
           <p>Platform-wide management and insights</p>
         </div>
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+
           <button 
             className="btn btn-outline" 
-            style={{ color: 'var(--accent-teal)', borderColor: 'var(--accent-teal)' }}
+            style={{ color: 'var(--accent-indigo)', borderColor: 'var(--accent-indigo)' }}
             onClick={() => {
-              if (!stats) return showError("Data not loaded yet");
-              const isSpeaking = window.speechSynthesis.speaking;
-              if (isSpeaking) {
-                window.speechSynthesis.cancel();
-                showSuccess("AI Briefing Paused", "Voice playback stopped.");
-                return;
-              }
-              const msg = new SpeechSynthesisUtterance();
-              const text = `Good ${new Date().getHours() < 12 ? 'morning' : 'afternoon'} Admin. GigShield A.I. is online and monitoring. We currently have ${stats.totalWorkers} workers protected under ${stats.activePolicies} active smart contracts. The protocol treasury has collected ${formatCurrency(stats.totalRevenue)} in revenue and distributed ${formatCurrency(stats.totalPayoutAmount)} across ${stats.approvedClaims} automated claims. All systems are operating normally.`;
-              msg.text = text;
-              msg.rate = 1.0;
-              msg.pitch = 1.1;
-              const voices = window.speechSynthesis.getVoices();
-              const femaleVoice = voices.find(v => v.name.includes('Female') || v.name.includes('Google UK English Female') || v.name.includes('Samantha') || v.name.includes('Zira'));
-              if (femaleVoice) msg.voice = femaleVoice;
-              window.speechSynthesis.speak(msg);
-              showSuccess("AI Briefing Active", "Ensure your device volume is turned up.");
+              if (!claims || claims.length === 0) return showError("No data", "There are no claims to export.");
+              
+              // Build CSV
+              const headers = ["ID", "Plan", "Event", "Risk Score", "Amount", "Status", "Date"];
+              const csvRows = [headers.join(",")];
+              
+              claims.forEach(c => {
+                csvRows.push([
+                  c.id, 
+                  "", 
+                  c.eventType, 
+                  c.riskScore, 
+                  c.claimAmount, 
+                  c.status, 
+                  c.createdAt || new Date().toISOString()
+                ].join(","));
+              });
+              
+              const csvString = csvRows.join("\n");
+              const blob = new Blob([csvString], { type: 'text/csv' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = gigshield_global_ledger.csv;
+              a.click();
+              showSuccess("Exported", "Global ledger downloaded successfully.");
             }}
           >
-            <Mic size={16} /> AI Voice Briefing
+            <FileText size={16} /> Export Ledger (CSV)
           </button>
+
+          
           
           <button 
             className="btn btn-primary" 
@@ -255,6 +241,14 @@ function AdminDashboard() {
 
       {stats && (
         <div className="metrics-grid stagger-children" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
+          <div className="glass-card" style={{ textAlign: 'center' }}>
+            <Activity size={20} style={{ color: (stats.totalPayoutAmount / (stats.totalRevenue || 1)) > 0.6 ? 'var(--accent-rose)' : 'var(--accent-sky)', marginBottom: 8 }} aria-hidden="true" />
+            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: (stats.totalPayoutAmount / (stats.totalRevenue || 1)) > 0.6 ? 'var(--accent-rose)' : 'var(--accent-sky)' }}>
+              {((stats.totalPayoutAmount / (stats.totalRevenue || 1)) * 100).toFixed(1)}%
+            </div>
+            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: 4 }}>Platform Loss Ratio</div>
+          </div>
+
           <div className="glass-card" style={{ textAlign: 'center' }}>
             <TrendingUp size={20} style={{ color: 'var(--accent-emerald)', marginBottom: 8 }} aria-hidden="true" />
             <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--accent-emerald)' }}>{formatCurrency(stats.totalRevenue)}</div>
@@ -467,15 +461,7 @@ function AdminDashboard() {
                               >
                                 {actionLoading === `reject-${claim.id}` ? <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} aria-hidden="true" /> : <><XCircle size={12} aria-hidden="true" /> Reject</>}
                               </button>
-                              <button
-                                className="admin-action-btn view"
-                                style={{ background: 'rgba(56, 189, 248, 0.1)', color: 'var(--accent-sky)' }}
-                                onClick={() => handleAIAnalysis(claim)}
-                                disabled={actionLoading === `ai-${claim.id}`}
-                                title="Run AI Fraud Analysis"
-                              >
-                                {actionLoading === `ai-${claim.id}` ? <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} aria-hidden="true" /> : <BrainCircuit size={14} aria-hidden="true" />}
-                              </button>
+                              
                             </div>
                           ) : (
                             <span style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>—</span>
