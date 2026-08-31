@@ -632,7 +632,7 @@ function Settings() {
               const url = URL.createObjectURL(blob);
               const a = document.createElement('a');
               a.href = url;
-              a.download = gigshield_data.json;
+              a.download = "gigshield_data.json";
               a.click();
               showSuccess('Downloaded', 'Your data export has started.');
             }}>

@@ -254,7 +254,7 @@ function AdminDashboard() {
               const url = URL.createObjectURL(blob);
               const a = document.createElement('a');
               a.href = url;
-              a.download = gigshield_global_ledger.csv;
+              a.download = "gigshield_global_ledger.csv";
               a.click();
               showSuccess("Exported", "Global ledger downloaded successfully.");
             }}
