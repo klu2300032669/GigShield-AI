@@ -8,7 +8,7 @@ import BackToTop from './components/ui/BackToTop.jsx';
 import { Breadcrumb } from './components/ui/Breadcrumb.jsx';
 import { DashboardSkeleton, TableSkeleton } from './components/ui/SkeletonLoader.jsx';
 import LoadingSpinner from './components/LoadingSpinner.jsx';
-import AIChatBot from './components/AIChatBot.jsx';
+
 
 // ── Code-split every page with React.lazy ──────────────────────────────────
 const Landing        = lazy(() => import('./pages/Landing.jsx'));
@@ -177,7 +177,7 @@ function App() {
           <Suspense fallback={<AuthFallback />}><NotFound /></Suspense>
         } />
       </Routes>
-      <AIChatBot />
+      
     </>
   );
 }

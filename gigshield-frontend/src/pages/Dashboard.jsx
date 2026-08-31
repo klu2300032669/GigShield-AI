@@ -91,57 +91,7 @@ function AIHealthWidget() {
   );
 }
 
-// ---- Live Smart Contract Terminal ----
-function LiveTerminalLog({ city }) {
-  const [logs, setLogs] = useState([]);
 
-  useEffect(() => {
-    const sequences = [
-      `> Connecting to Oracle Node (${city})...`,
-      `> Syncing latest telemetry data from Open-Meteo...`,
-      `> Verifying Smart Contract Policy Hash...`,
-      `> Hash matched. Running AI Anomaly Detection...`,
-      `> ML Risk Model executed. Score: Low Risk.`,
-      `> Auto-Adjudication engine standing by.`
-    ];
-    
-    let i = 0;
-    const interval = setInterval(() => {
-      if (i < sequences.length) {
-        setLogs(prev => [...prev, sequences[i]]);
-        i++;
-      } else {
-        clearInterval(interval);
-      }
-    }, 1500);
-    return () => clearInterval(interval);
-  }, [city]);
-
-  return (
-    <div style={{
-      marginTop: '24px', padding: '16px', background: 'var(--bg-primary)',
-      borderRadius: 'var(--radius-sm)', border: '1px solid #1e293b',
-      fontFamily: 'monospace', fontSize: '0.8rem', color: '#10b981',
-      boxShadow: 'inset 0 0 10px rgba(0,0,0,0.5)',
-      height: '140px', overflowY: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end'
-    }}>
-      <div style={{ color: '#38bdf8', marginBottom: '8px', borderBottom: '1px dashed #334155', paddingBottom: '4px' }}>
-        <Zap size={12} style={{ display: 'inline', marginRight: '4px' }} />
-        SMART CONTRACT ADJUDICATION LOG
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-        {logs.map((log, idx) => (
-          <div key={idx} className="animate-fade-in-up" style={{ animationDuration: '300ms' }}>
-            {log}
-          </div>
-        ))}
-        {logs.length < 6 && (
-          <div className="skeleton-pulse" style={{ height: '14px', width: '8px', background: '#10b981' }} />
-        )}
-      </div>
-    </div>
-  );
-}
 
 // ---- Real-time Weather Widget ----
 function WeatherWidgetMini({ city, coordinates, onWeatherUpdate }) {
@@ -560,7 +510,7 @@ function Dashboard() {
           <WeatherWidgetMini city={city} coordinates={coordinates} onWeatherUpdate={setLiveWeather} />
           <AIHealthWidget />
         </div>
-        <LiveTerminalLog city={city} />
+        
       </div>
 
       {/* Hero Alerts: Risk & Weather */}
