@@ -22,8 +22,8 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // If 401 and not already retrying, attempt token refresh
-    if (error.response?.status === 401 && !originalRequest._retry && 
+    // If 401/403 and not already retrying, attempt token refresh
+    if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry && 
         !originalRequest.url.includes('/login') && 
         !originalRequest.url.includes('/register')) {
       originalRequest._retry = true;

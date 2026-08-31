@@ -38,7 +38,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // Public endpoints (no auth required)
                 .requestMatchers("/api/v1/workers/register", "/api/v1/workers/login",
-                        "/api/v1/workers/verify-email", "/api/v1/workers/forgot-password").permitAll()
+                        "/api/v1/workers/verify-email", "/api/v1/workers/forgot-password", "/api/v1/workers/refresh-token").permitAll()
                 .requestMatchers("/api/v1/otp/**").permitAll()
                 .requestMatchers("/api/v1/auth/**").permitAll()
                 .requestMatchers("/api/v1/payments/webhook").permitAll()
